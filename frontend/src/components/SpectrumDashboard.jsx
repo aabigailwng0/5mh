@@ -18,7 +18,7 @@ const AXIS_META = {
   },
   acne: {
     title: "Acne",
-    subtitle: "inflamed breakout activity",
+    subtitle: "Breakout activity",
     icon: Sparkles,
     goodIsHigh: false,
   },
@@ -54,10 +54,10 @@ function AxisCard({ axisKey, data }) {
     <div className="panel">
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <Icon className="h-4 w-4 text-warm-cream/70" strokeWidth={1.5} />
+          <Icon className="h-4 w-4 text-black/70" strokeWidth={1.5} />
           <div>
-            <div className="text-body font-medium leading-tight text-warm-cream">{meta.title}</div>
-            <div className="text-caption uppercase tracking-wide text-grey-brown">
+            <div className="text-body font-medium leading-tight text-black">{meta.title}</div>
+            <div className="text-caption uppercase tracking-wide text-black/60">
               {meta.subtitle}
             </div>
           </div>
@@ -66,11 +66,11 @@ function AxisCard({ axisKey, data }) {
           <div className="font-display text-heading-sm font-medium" style={{ color }}>
             {data.value.toFixed(0)}%
           </div>
-          <div className="text-caption uppercase tracking-wide text-grey-brown">{data.label}</div>
+          <div className="text-caption uppercase tracking-wide text-black/60">{data.label}</div>
         </div>
       </div>
 
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-cork-shadow">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-purple-200">
         <div
           className="spectrum-fill h-full rounded-full"
           style={{ width: `${data.value}%`, backgroundColor: color }}
@@ -85,7 +85,7 @@ function AxisCard({ axisKey, data }) {
               className="flex items-center justify-between text-caption uppercase tracking-wide"
             >
               <span className="text-grey-brown">{name}</span>
-              <span className={val < 0 ? "text-warm-cream/50" : "text-warm-cream"}>
+              <span className={val < 0 ? "text-black/50" : "text-black"}>
                 {val > 0 ? "+" : ""}
                 {val}
               </span>
@@ -103,9 +103,9 @@ export default function SpectrumDashboard({ analysis }) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="font-display text-heading-sm font-medium tracking-tight">Skin spectrum</h2>
-        <span className="text-caption uppercase tracking-[0.18em] text-grey-brown">
-          scored from: {analysis.source}
+        <h2 className="font-display text-heading-sm font-medium tracking-tight">Skin Quality</h2>
+        <span className="text-caption uppercase tracking-[0.18em] text-black/60">
+          scored using {analysis.source}
         </span>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -114,7 +114,7 @@ export default function SpectrumDashboard({ analysis }) {
         ))}
       </div>
       {analysis.notes?.length > 0 && (
-        <ul className="mt-4 list-inside list-disc text-caption text-grey-brown">
+        <ul className="mt-4 list-inside list-disc text-caption text-black/60">
           {analysis.notes.map((n, i) => (
             <li key={i}>{n}</li>
           ))}

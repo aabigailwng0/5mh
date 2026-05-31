@@ -57,7 +57,7 @@ export default function ProductLog({ products, setProducts }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-caption uppercase tracking-[0.2em] text-grey-brown">Today's products</h3>
+        <h3 className="text-caption uppercase tracking-[0.2em] text-black">Today's products</h3>
         <button onClick={() => setManual((v) => !v)} className="btn-flat">
           <PencilLine className="h-3 w-3" /> {manual ? "search instead" : "enter manually"}
         </button>
@@ -66,15 +66,15 @@ export default function ProductLog({ products, setProducts }) {
       {/* logged products */}
       <div className="flex flex-wrap gap-2">
         {products.length === 0 && (
-          <span className="text-body text-warm-cream/40">No products logged yet.</span>
+          <span className="text-body text-black/40">No products logged yet.</span>
         )}
         {products.map((p, i) => (
           <span
             key={i}
-            className="flex items-center gap-2 rounded-rounded border border-warm-cream/60 py-1.5 pl-3 pr-2 text-body"
+            className="flex items-center gap-2 rounded-rounded border border-purple-300 py-1.5 pl-3 pr-2 text-body"
           >
             {p.name}
-            <button onClick={() => remove(i)} className="text-grey-brown hover:text-burnt-sienna">
+            <button onClick={() => remove(i)} className="text-black hover:text-purple-600">
               <X className="h-3.5 w-3.5" />
             </button>
           </span>
@@ -82,7 +82,7 @@ export default function ProductLog({ products, setProducts }) {
       </div>
 
       {manual ? (
-        <div className="flex flex-col gap-3 border-t border-dashed border-cork-shadow pt-4">
+        <div className="flex flex-col gap-3 border-t border-dashed border-purple-300 pt-4">
           <input
             value={manualName}
             onChange={(e) => setManualName(e.target.value)}
@@ -102,27 +102,27 @@ export default function ProductLog({ products, setProducts }) {
         </div>
       ) : (
         <div className="relative">
-          <div className="flex items-center gap-2 border-b border-warm-cream/50 px-1 py-1.5">
-            <Search className="h-4 w-4 text-grey-brown" />
+          <div className="flex items-center gap-2 border-b border-black/20 px-1 py-1.5">
+            <Search className="h-4 w-4 text-black" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products (e.g. CeraVe, Retinol, Cleanser)…"
-              className="w-full bg-transparent text-body text-warm-cream outline-none placeholder:text-warm-cream/35"
+              className="w-full bg-transparent text-body text-black outline-none placeholder:text-black/35"
             />
           </div>
           {results.length > 0 && (
-            <div className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-card border border-cork-shadow bg-studio-black">
+            <div className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-card border border-purple-400 bg-white">
               {results.map((p, i) => (
                 <button
                   key={i}
                   onClick={() => addCatalog(p)}
-                  className="w-full border-b border-cork-shadow px-3 py-2 text-left transition-colors last:border-0 hover:bg-dark-cork"
+                  className="w-full border-b border-purple-200 px-3 py-2 text-left transition-colors last:border-0 hover:bg-purple-50"
                 >
-                  <div className="text-body text-warm-cream">
+                  <div className="text-body text-black">
                     {p.brand} {p.name}
                   </div>
-                  <div className="text-caption uppercase tracking-wide text-grey-brown">
+                  <div className="text-caption uppercase tracking-wide text-black/60">
                     {p.category} · {p.raw_ingredients?.length || 0} ingredients · {p.source}
                   </div>
                 </button>

@@ -3,49 +3,49 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-/* Studio canvas: warm near-black, single warm-cream foreground. No gradient. */
+/* Beige background with black text. */
 body {
   margin: 0;
-  background: #100904;
+  background: #f5f1ed;
   min-height: 100vh;
   font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  color: #ffedd7;
+  color: #000000;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: #dc5000;
-  color: #ffedd7;
+  background: #ccb5f8;
+  color: #000000;
 }
 
 @layer components {
-  /* Bordered ghost container — no fill, no shadow; structure via hairline. */
+  /* Bordered ghost container — no fill, no shadow; structure via purple hairline. */
   .panel {
-    @apply rounded-card border border-cork-shadow p-6 bg-transparent;
+    @apply rounded-card border border-purple-400 p-6 bg-transparent;
   }
 
-  /* Primary action: contained warm-brown swatch + burnt-sienna hairline. */
+  /* Primary action: purple button with purple border. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-burnt-sienna
-      bg-dark-cork px-6 py-3 text-body font-medium text-warm-cream transition-colors
-      duration-200 hover:bg-[#46301c] disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-purple-600
+      bg-purple-100 px-6 py-3 text-body font-medium text-black transition-colors
+      duration-200 hover:bg-purple-200 disabled:opacity-50;
   }
 
-  /* Outlined ghost pill — transparent, cream outline, sienna on hover. */
+  /* Outlined ghost pill — transparent, black outline, purple on hover. */
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-rounded border border-warm-cream
-      bg-transparent px-5 py-2 text-body text-warm-cream transition-colors duration-300
-      hover:border-burnt-sienna;
+    @apply inline-flex items-center justify-center gap-2 rounded-rounded border border-black
+      bg-transparent px-5 py-2 text-body text-black transition-colors duration-300
+      hover:border-purple-600;
   }
 
   /* Flat inline text action — underlined link with button semantics. */
   .btn-flat {
-    @apply inline-flex items-center gap-1 border-b border-warm-cream bg-transparent pb-0.5
-      text-caption uppercase tracking-wide text-warm-cream transition-colors duration-200
-      hover:border-burnt-sienna hover:text-burnt-sienna;
+    @apply inline-flex items-center gap-1 border-b border-black bg-transparent pb-0.5
+      text-caption uppercase tracking-wide text-black transition-colors duration-200
+      hover:border-purple-600 hover:text-purple-600;
   }
 
   /* Single-line entry: bottom-border only, sharp corners. */
@@ -57,7 +57,7 @@ body {
 
   /* Dashed spatial divider. */
   .divider {
-    @apply border-0 border-t border-dashed border-cork-shadow;
+    @apply border-0 border-t border-solid border-cork-shadow;
   }
 }
 

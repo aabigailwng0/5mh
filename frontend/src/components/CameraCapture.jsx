@@ -34,11 +34,11 @@ export default function CameraCapture({ onPhoto, preview }) {
 
   return (
     <div className="flex flex-col items-center gap-5">
-      <div className="relative h-[300px] w-[300px] overflow-hidden rounded-card border border-cork-shadow bg-studio-black">
+      <div className="relative h-[300px] w-[300px] overflow-hidden rounded-card border border-purple-400 bg-white">
         {preview ? (
           <img src={preview} alt="Captured face" className="h-full w-full object-cover" />
         ) : useUpload ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-grey-brown">
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-black/60">
             <Upload className="h-9 w-9" />
             <span className="text-caption uppercase tracking-wide">Choose a photo</span>
           </div>

@@ -6,13 +6,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        "studio-black": "#100904",
-        "warm-cream": "#ffedd7",
-        "cork-shadow": "#40372e",
-        "dark-cork": "#382416",
-        "burnt-sienna": "#dc5000",
-        "grey-brown": "#6c5f51",
-        "forest-grid": "#445231",
+        "studio-black": "#f5f1ed",
+        "warm-cream": "#000000",
+        "cork-shadow": "#ccb5f8",
+        "dark-cork": "#ccb5f8",
+        "burnt-sienna": "#ccb5f8",
+        "grey-brown": "#000000",
+        "forest-grid": "#ccb5f8",
       },
       fontFamily: {
         // halyard-display-variable substitute (per the design spec).

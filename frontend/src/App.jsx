@@ -66,12 +66,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen text-warm-cream">
+    <div className="min-h-screen text-black">
       {/* Top-fixed minimal nav */}
-      <nav className="sticky top-0 z-20 border-b border-cork-shadow bg-studio-black/90 backdrop-blur">
+      <nav className="sticky top-0 z-20 border-b border-purple-400 bg-white/90 back
+      op-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <span className="text-subheading font-medium tracking-tight">GLOW</span>
-          <div className="hidden gap-6 text-caption uppercase tracking-[0.18em] text-warm-cream/80 sm:flex">
+          <div className="hidden gap-6 text-caption uppercase tracking-[0.18em] text-black sm:flex">
             <span>Scan</span>
             <span>Sustain</span>
             <span>Share</span>
@@ -83,11 +84,11 @@ export default function App() {
         <h1 className="max-w-3xl font-display text-heading-lg font-medium leading-[0.92] tracking-tight md:text-display">
           glow
         </h1>
-        <p className="mt-5 max-w-xl text-subheading text-warm-cream/70">
+        <p className="mt-5 max-w-xl text-subheading text-black/70">
           Your personal skin intelligence platform, so you can <strong>keep glowing</strong>. 
           Upload one photo and log your products to receive customized insights, recommendations, and tracking.
         </p>
-        <span className="mt-4 inline-block text-caption uppercase tracking-[0.2em] text-burnt-sienna">
+        <span className="mt-4 inline-block text-caption uppercase tracking-[0.2em] text-purple-600">
         </span>
       </header>
 
@@ -144,19 +145,19 @@ export default function App() {
               </button>
             )}
           </div>
-          {error && <p className="text-body text-burnt-sienna">{error}</p>}
+            {error && <p className="text-body text-purple-600">{error}</p>}
         </section>
 
         {/* RIGHT: results column */}
         <section className="space-y-6">
           {!result ? (
-            <div className="flex min-h-[420px] flex-col items-center justify-center rounded-card border border-dashed border-cork-shadow p-10 text-center">
-              <span className="mb-4 text-caption uppercase tracking-[0.25em] text-burnt-sienna">
+            <div className="flex min-h-[420px] flex-col items-center justify-center rounded-card border border-solid border-purple-400 p-10 text-center">
+              <span className="mb-4 text-caption uppercase tracking-[0.25em] text-purple-600">
                 Awaiting input
               </span>
-              <p className="max-w-sm text-subheading text-warm-cream/60">
+              <p className="max-w-sm text-subheading text-black/60">
                 Capture a photo, log what you used today, then press{" "}
-                <span className="text-warm-cream">analyze skin</span> to see your personalized 
+                <span className="text-black">analyze skin</span> to see your personalized 
                 insights including ingredient clashes, product recommendations, and more.
               </p>
             </div>
@@ -177,7 +178,7 @@ export default function App() {
 
       <footer className="mx-auto max-w-6xl px-6 pb-12">
         <hr className="divider mb-5" />
-        <p className="text-caption uppercase tracking-[0.18em] text-grey-brown">
+        <p className="text-caption uppercase tracking-[0.18em] text-black">
           Every score traces back to a labelled feature or a documented coefficient · Not medical
           advice
         </p>

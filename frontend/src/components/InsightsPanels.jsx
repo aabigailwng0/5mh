@@ -1,23 +1,23 @@
 import React from "react";
 import { AlertTriangle, Sun, Moon, Lightbulb, FlaskConical } from "lucide-react";
 
-// Severity → warm hairline treatment. High clashes get the burnt-sienna edge.
+// Severity → purple hairline treatment. High severity gets the purple edge.
 const SEVERITY_STYLE = {
-  high: "border-burnt-sienna",
-  moderate: "border-warm-cream/60",
-  low: "border-cork-shadow",
+  high: "border-purple-600",
+  moderate: "border-purple-400",
+  low: "border-purple-200",
 };
 const SEVERITY_TEXT = {
-  high: "text-burnt-sienna",
-  moderate: "text-warm-cream",
-  low: "text-grey-brown",
+  high: "text-purple-600",
+  moderate: "text-black",
+  low: "text-black/60",
 };
 
 function SectionLabel({ icon: Icon, children, accent }) {
   return (
     <div className="mb-4 flex items-center gap-2">
-      <Icon className={`h-4 w-4 ${accent || "text-warm-cream/70"}`} strokeWidth={1.5} />
-      <h3 className="text-caption uppercase tracking-[0.2em] text-grey-brown">{children}</h3>
+      <Icon className={`h-4 w-4 ${accent || "text-black/70"}`} strokeWidth={1.5} />
+      <h3 className="text-caption uppercase tracking-[0.2em] text-black">{children}</h3>
     </div>
   );
 }
@@ -25,8 +25,8 @@ function SectionLabel({ icon: Icon, children, accent }) {
 export function IngredientScore({ score }) {
   if (!score) return null;
   const items = [
-    { label: "Comedogenic load", value: score.comedogenic_load, hint: "→ acne axis" },
-    { label: "Irritant load", value: score.irritant_load, hint: "→ redness axis" },
+    { label: "Comedogenic load", value: score.comedogenic_load, hint: "Pore Clogging Weight" },
+    { label: "Irritant load", value: score.irritant_load, hint: "Irritation Weight" },
     {
       label: "Active clash",
       value: score.active_interaction_flag ? "Yes" : "No",
@@ -36,16 +36,16 @@ export function IngredientScore({ score }) {
   return (
     <div className="panel">
       <SectionLabel icon={FlaskConical}>Ingredient load (from your products)</SectionLabel>
-      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-card border border-cork-shadow bg-cork-shadow">
+      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-card border border-purple-400 bg-purple-100">
         {items.map((it) => (
           <div key={it.label} className="bg-studio-black p-4 text-center">
-            <div className="font-display text-heading-sm font-medium text-warm-cream">
+            <div className="font-display text-heading-sm font-medium text-black">
               {it.value}
             </div>
-            <div className="mt-1 text-caption uppercase tracking-wide text-warm-cream/80">
+            <div className="mt-1 text-caption uppercase tracking-wide text-black/80">
               {it.label}
             </div>
-            <div className="text-caption text-grey-brown">{it.hint}</div>
+            <div className="text-caption text-black/60">{it.hint}</div>
           </div>
         ))}
       </div>
@@ -54,7 +54,7 @@ export function IngredientScore({ score }) {
           {score.matched_ingredients.map((m) => (
             <span
               key={m}
-              className="rounded-rounded border border-cork-shadow px-2 py-0.5 text-caption text-warm-cream/70"
+              className="rounded-rounded border border-purple-300 px-2 py-0.5 text-caption text-black/70"
             >
               {m}
             </span>
@@ -69,17 +69,17 @@ export function Warnings({ warnings }) {
   if (!warnings) return null;
   return (
     <div className="panel">
-      <SectionLabel icon={AlertTriangle} accent="text-burnt-sienna">
+      <SectionLabel icon={AlertTriangle} accent="text-purple-600">
         Interaction warnings
       </SectionLabel>
       {warnings.length === 0 ? (
-        <p className="text-body text-warm-cream/40">No clashing ingredients detected today.</p>
+        <p className="text-body text-black/40">No clashing ingredients detected today.</p>
       ) : (
         <div className="space-y-3">
           {warnings.map((w, i) => (
             <div key={i} className={`rounded-card border ${SEVERITY_STYLE[w.severity] || SEVERITY_STYLE.low} p-3`}>
               <div className="flex items-center justify-between">
-                <span className="text-body font-medium text-warm-cream">
+                <span className="text-body font-medium text-black">
                   {w.ingredient_a} + {w.ingredient_b}
                 </span>
                 <span
@@ -88,12 +88,12 @@ export function Warnings({ warnings }) {
                   {w.severity}
                 </span>
               </div>
-              <p className="mt-1 text-body text-warm-cream/70">{w.problem}</p>
+              <p className="mt-1 text-body text-black/70">{w.problem}</p>
               {w.recommendation && (
-                <p className="mt-1 text-caption italic text-warm-cream/50">Fix: {w.recommendation}</p>
+                <p className="mt-1 text-caption italic text-black/50">Fix: {w.recommendation}</p>
               )}
               {w.products_involved?.length > 0 && (
-                <p className="mt-1 text-caption uppercase tracking-wide text-grey-brown">
+                <p className="mt-1 text-caption uppercase tracking-wide text-black/60">
                   From: {w.products_involved.join(" + ")}
                 </p>
               )}
@@ -108,12 +108,12 @@ export function Warnings({ warnings }) {
 function RoutineColumn({ title, icon: Icon, steps }) {
   return (
     <div>
-      <div className="mb-3 flex items-center gap-2 text-warm-cream/80">
+      <div className="mb-3 flex items-center gap-2 text-black/80">
         <Icon className="h-4 w-4" strokeWidth={1.5} />
         <span className="text-caption uppercase tracking-[0.2em]">{title}</span>
       </div>
       {steps.length === 0 ? (
-        <p className="text-caption text-grey-brown">Nothing scheduled.</p>
+        <p className="text-caption text-black/60">Nothing scheduled.</p>
       ) : (
         <ol className="space-y-3">
           {steps.map((s, i) => (
