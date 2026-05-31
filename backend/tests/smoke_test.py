@@ -119,8 +119,22 @@ def main() -> None:
         }
         engine.log_day(start + timedelta(days=i), _sample_image(sev), day_products, lifestyle)
 
-    attribution = engine.attribution("acne")
-    print(json.dumps(attribution, indent=2))
+    for level in ("aggregate", "ingredient"):
+        print(f"\n  --- level: {level} ---")
+        attribution = engine.attribution("acne", level=level)
+        if attribution["status"] != "ok":
+            print(f"  status: {attribution['status']} — {attribution.get('message')}")
+            continue
+        fit = attribution["fit"]
+        print(
+            f"  fit: CV R²={fit['r2_cv_mean']} (in-sample {fit['r2_in_sample']}) "
+            f"· {fit['n_features']} drivers · reliability={fit['reliability']}"
+        )
+        for d in attribution["drivers"][:4]:
+            flag = "✓" if d["significant"] else " "
+            print(f"   [{flag}] {d['sentence']}")
+        for c in attribution["caveats"]:
+            print(f"   ! {c}")
 
     print("\nSMOKE TEST OK")
 

@@ -116,8 +116,10 @@ def create_app() -> FastAPI:
 
     # ---------------------------------------------------------------- attribution
     @app.get("/api/attribution")
-    def attribution(axis: str = "acne") -> dict:
-        return engine.attribution(axis)
+    def attribution(axis: str = "acne", level: str = "aggregate") -> dict:
+        if level not in ("aggregate", "ingredient"):
+            level = "aggregate"
+        return engine.attribution(axis, level=level)
 
     @app.get("/api/history")
     def history() -> dict:

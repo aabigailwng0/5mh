@@ -1,180 +1,73 @@
 import React, { useState } from "react";
-import { Loader2, ArrowRight, Save } from "lucide-react";
-import CameraCapture from "./components/CameraCapture";
-import ProductLog from "./components/ProductLog";
-import SpectrumDashboard from "./components/SpectrumDashboard";
-import {
-  IngredientScore,
-  Warnings,
-  Schedule,
-  Recommendations,
-} from "./components/InsightsPanels";
-import AttributionPanel from "./components/AttributionPanel";
-import { analyze, logDay } from "./api";
+import { ScanLine, LayoutList, TrendingUp } from "lucide-react";
+import ScanPage from "./pages/ScanPage";
+import ReportsPage from "./pages/ReportsPage";
+import TrendsPage from "./pages/TrendsPage";
+
+const TABS = [
+  { id: "scan", label: "Scan", icon: ScanLine },
+  { id: "reports", label: "Reports", icon: LayoutList },
+  { id: "trends", label: "Trends", icon: TrendingUp },
+];
+
+const HEADERS = {
+  scan: {
+    title: "glow",
+    subtitle:
+      "Snap a photo, log your products, and get your four skin scores, how they moved, and what to do next.",
+  },
+  reports: {
+    title: "your history",
+    subtitle: "Every saved scan in full detail, latest first.",
+  },
+  trends: {
+    title: "trends & drivers",
+    subtitle: "What's actually moving your skin over time, and which factors matter most.",
+  },
+};
 
 export default function App() {
-  const [photo, setPhoto] = useState(null); // { blob, url }
-  const [products, setProducts] = useState([]);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [saved, setSaved] = useState(false);
-  const [sleep, setSleep] = useState("");
-  const [dairy, setDairy] = useState("");
-
-  const onPhoto = (blob, url) => {
-    setPhoto(blob ? { blob, url } : null);
-    setResult(null);
-    setSaved(false);
-  };
-
-  const productRefs = products.map(({ name, ingredients, category }) => ({
-    name,
-    ingredients,
-    category,
-  }));
-
-  const runAnalyze = async () => {
-    if (!photo) {
-      setError("Capture or upload a face photo first.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    try {
-      setResult(await analyze(photo.blob, productRefs));
-      setSaved(false);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const saveToday = async () => {
-    if (!photo) return;
-    const lifestyle = {};
-    if (sleep) lifestyle.sleep_hours = parseFloat(sleep);
-    if (dairy) lifestyle.dairy_servings = parseFloat(dairy);
-    await logDay({
-      imageBlob: photo.blob,
-      entryDate: new Date().toISOString().slice(0, 10),
-      productRefs,
-      lifestyle,
-    });
-    setSaved(true);
-  };
+  const [page, setPage] = useState("scan");
+  // Bumped whenever a day is logged so the Reports page re-reads localStorage.
+  const [refreshKey, setRefreshKey] = useState(0);
 
   return (
     <div className="min-h-screen text-black">
-      {/* Top-fixed minimal nav */}
-      <nav className="sticky top-0 z-20 border-b border-purple-400 bg-white/90 back
-      op-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-subheading font-medium tracking-tight">GLOW</span>
-          <div className="hidden gap-6 text-caption uppercase tracking-[0.18em] text-black sm:flex">
-            <span>Scan</span>
-            <span>Sustain</span>
-            <span>Share</span>
+      {/* Top nav with real page switching */}
+      <nav className="sticky top-0 z-20 h-28 border-b border-purple-400 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-6">
+          <img src="/mh_logo.png" alt="GLOW" className="h-24 w-auto object-contain" />
+          <div className="flex gap-1">
+            {TABS.map((t) => {
+              const Icon = t.icon;
+              const active = page === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setPage(t.id)}
+                  className={`flex items-center gap-1.5 rounded-rounded px-3 py-1.5 text-caption uppercase tracking-[0.18em] transition-colors ${
+                    active ? "bg-purple-200 text-black" : "text-black/55 hover:text-black"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </nav>
 
       <header className="mx-auto max-w-6xl px-6 pb-8 pt-12">
         <h1 className="max-w-3xl font-display text-heading-lg font-medium leading-[0.92] tracking-tight md:text-display">
-          glow
+          {HEADERS[page].title}
         </h1>
-        <p className="mt-5 max-w-xl text-subheading text-black/70">
-          Your personal skin intelligence platform, so you can <strong>keep glowing</strong>. 
-          Upload one photo and log your products to receive customized insights, recommendations, and tracking.
-        </p>
-        <span className="mt-4 inline-block text-caption uppercase tracking-[0.2em] text-purple-600">
-        </span>
+        <p className="mt-5 max-w-xl text-subheading text-black/70">{HEADERS[page].subtitle}</p>
       </header>
 
-      <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 pb-20 lg:grid-cols-[360px_1fr]">
-        {/* LEFT: input column */}
-        <section className="space-y-6">
-          <div className="panel">
-            <h2 className="mb-5 text-caption uppercase tracking-[0.2em] text-grey-brown">
-              Today's photo
-            </h2>
-            <CameraCapture onPhoto={onPhoto} preview={photo?.url} />
-          </div>
-
-          <div className="panel">
-            <ProductLog products={products} setProducts={setProducts} />
-          </div>
-
-          <div className="panel">
-            <h3 className="mb-4 text-caption uppercase tracking-[0.2em] text-grey-brown">
-              Lifestyle (optional)
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <label className="text-caption uppercase tracking-wide text-grey-brown">
-                Sleep (hrs)
-                <input
-                  type="number"
-                  value={sleep}
-                  onChange={(e) => setSleep(e.target.value)}
-                  className="input-line mt-2"
-                  placeholder="7.5"
-                />
-              </label>
-              <label className="text-caption uppercase tracking-wide text-grey-brown">
-                Dairy (servings)
-                <input
-                  type="number"
-                  value={dairy}
-                  onChange={(e) => setDairy(e.target.value)}
-                  className="input-line mt-2"
-                  placeholder="1"
-                />
-              </label>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <button onClick={runAnalyze} disabled={loading} className="btn-primary flex-1">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-              {loading ? "Analyzing" : "ANALYZE SKIN"}
-            </button>
-            {result && (
-              <button onClick={saveToday} className="btn-ghost">
-                <Save className="h-4 w-4" /> {saved ? "Saved" : "Log day"}
-              </button>
-            )}
-          </div>
-            {error && <p className="text-body text-purple-600">{error}</p>}
-        </section>
-
-        {/* RIGHT: results column */}
-        <section className="space-y-6">
-          {!result ? (
-            <div className="flex min-h-[420px] flex-col items-center justify-center rounded-card border border-solid border-purple-400 p-10 text-center">
-              <span className="mb-4 text-caption uppercase tracking-[0.25em] text-purple-600">
-                Awaiting input
-              </span>
-              <p className="max-w-sm text-subheading text-black/60">
-                Capture a photo, log what you used today, then press{" "}
-                <span className="text-black">analyze skin</span> to see your personalized 
-                insights including ingredient clashes, product recommendations, and more.
-              </p>
-            </div>
-          ) : (
-            <>
-              <SpectrumDashboard analysis={result.analysis} />
-              <IngredientScore score={result.ingredient_score} />
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <Warnings warnings={result.warnings} />
-                <Schedule schedule={result.schedule} />
-              </div>
-              <Recommendations recommendations={result.recommendations} />
-            </>
-          )}
-          <AttributionPanel />
-        </section>
-      </main>
+      {page === "scan" && <ScanPage onLogged={() => setRefreshKey((k) => k + 1)} />}
+      {page === "reports" && <ReportsPage refreshKey={refreshKey} />}
+      {page === "trends" && <TrendsPage refreshKey={refreshKey} />}
 
       <footer className="mx-auto max-w-6xl px-6 pb-12">
         <hr className="divider mb-5" />

@@ -95,6 +95,12 @@ class EngineConfig:
     # Minimum number of daily entries before we attempt regression attribution.
     min_entries_for_attribution: int = 10
     max_lag_days: int = 3
+    # Ridge penalty strength (stabilises coefficients on short, collinear series).
+    attribution_ridge_alpha: float = 1.0
+    # Bootstrap resamples used to build per-driver confidence intervals / p-values.
+    attribution_bootstrap_samples: int = 500
+    # Seed so attribution results are reproducible across identical requests.
+    attribution_random_state: int = 7
 
     def ensure_dirs(self) -> None:
         """Create runtime directories if they don't exist yet."""

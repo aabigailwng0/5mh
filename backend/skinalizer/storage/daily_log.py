@@ -50,15 +50,32 @@ class DailyLogStore:
     def count(self) -> int:
         return len(self._entries)
 
-    def to_dataframe(self) -> pd.DataFrame:
+    # Prefix marking a per-ingredient presence column, so downstream code can
+    # tell ingredient drivers apart from aggregate/lifestyle ones by name alone.
+    INGREDIENT_PREFIX = "ing:"
+
+    def to_dataframe(self, include_ingredients: bool = False) -> pd.DataFrame:
         """Flatten entries into one row per day with numeric columns.
 
         Columns produced (when present):
             entry_date, <axis> for each SkinAxis, comedogenic_load,
             irritant_load, active_interaction_flag, plus any numeric lifestyle
             keys (sleep_hours, temp_c, humidity, dairy, ...).
+
+        When ``include_ingredients`` is True, each ingredient ever matched gets
+        an extra binary "presence" column named ``ing:<INCI name>`` (1 on days it
+        was used, 0 otherwise). These power ingredient-level attribution, where a
+        coefficient reads as "points attributable to using this one ingredient".
         """
         records: list[dict[str, Any]] = []
+        # Union of every ingredient seen across history, so all days share the
+        # same column set (absent ⇒ 0, never NaN — keeps the design matrix dense).
+        all_ingredients: set[str] = set()
+        if include_ingredients:
+            for row in self.all_entries():
+                ing = row.get("ingredient_score") or {}
+                all_ingredients.update(ing.get("matched_ingredients") or [])
+
         for row in self.all_entries():
             rec: dict[str, Any] = {"entry_date": row["entry_date"]}
             analysis = row.get("analysis") or {}
@@ -71,6 +88,10 @@ class DailyLogStore:
                 rec["comedogenic_load"] = ing.get("comedogenic_load", 0.0)
                 rec["irritant_load"] = ing.get("irritant_load", 0.0)
                 rec["active_interaction_flag"] = int(bool(ing.get("active_interaction_flag")))
+            if include_ingredients:
+                used_today = set(ing.get("matched_ingredients") or [])
+                for name in all_ingredients:
+                    rec[f"{self.INGREDIENT_PREFIX}{name}"] = int(name in used_today)
             for key, val in (row.get("lifestyle") or {}).items():
                 if isinstance(val, (int, float)) and not isinstance(val, bool):
                     rec[key] = val

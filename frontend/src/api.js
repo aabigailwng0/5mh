@@ -44,10 +44,21 @@ export async function logDay({ imageBlob, entryDate, productRefs, lifestyle }) {
   return res.json();
 }
 
-export async function getAttribution(axis = "acne") {
-  const res = await fetch(`${BASE}/attribution?axis=${encodeURIComponent(axis)}`);
+// level: "aggregate" (comedogenic/irritant loads + lifestyle) or
+// "ingredient" (individual ingredient presence + lifestyle).
+export async function getAttribution(axis = "acne", level = "aggregate") {
+  const res = await fetch(
+    `${BASE}/attribution?axis=${encodeURIComponent(axis)}&level=${encodeURIComponent(level)}`
+  );
   if (!res.ok) throw new Error("Attribution failed");
   return res.json();
+}
+
+export async function getHistory() {
+  const res = await fetch(`${BASE}/history`);
+  if (!res.ok) throw new Error("History failed");
+  const data = await res.json();
+  return data.entries || [];
 }
 
 export async function getHealth() {

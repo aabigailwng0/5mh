@@ -78,6 +78,9 @@ class SkinalizerEngine:
         self.attribution_engine = AttributionEngine(
             min_entries=self.config.min_entries_for_attribution,
             max_lag=self.config.max_lag_days,
+            ridge_alpha=self.config.attribution_ridge_alpha,
+            n_bootstrap=self.config.attribution_bootstrap_samples,
+            random_state=self.config.attribution_random_state,
         )
         self.log_store = DailyLogStore(self.config.storage_dir)
 
@@ -202,11 +205,17 @@ class SkinalizerEngine:
         return result
 
     # -------------------------------------------------------------- attribution
-    def attribution(self, axis: str | None = None) -> dict[str, Any]:
-        """Run distributed-lag attribution for one axis (default: acne)."""
+    def attribution(self, axis: str | None = None, level: str = "aggregate") -> dict[str, Any]:
+        """Run distributed-lag attribution for one axis (default: acne).
+
+        ``level`` is "aggregate" (comedogenic/irritant loads + lifestyle) or
+        "ingredient" (individual ingredient presence + lifestyle). The latter
+        needs the per-ingredient presence columns, so we ask the store to expand
+        them only when requested.
+        """
         axis = axis or SkinAxis.ACNE.value
-        df = self.log_store.to_dataframe()
-        return self.attribution_engine.analyze(df, axis)
+        df = self.log_store.to_dataframe(include_ingredients=(level == "ingredient"))
+        return self.attribution_engine.analyze(df, axis, level=level)
 
     def history(self) -> list[dict]:
         return self.log_store.all_entries()
