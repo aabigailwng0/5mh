@@ -121,7 +121,7 @@ export default function ScanPage({ onLogged }) {
       {/* LEFT: input column */}
       <section className="space-y-6">
         <div className="panel">
-          <h2 className="mb-5 text-caption uppercase tracking-[0.2em] text-black/60">Today's photo</h2>
+          <h2 className="eyebrow mb-5">01 — Today's photo</h2>
           <CameraCapture onPhoto={onPhoto} preview={photo?.url} />
         </div>
 
@@ -130,9 +130,7 @@ export default function ScanPage({ onLogged }) {
         </div>
 
         <div className="panel">
-          <h3 className="mb-4 text-caption uppercase tracking-[0.2em] text-black/60">
-            Lifestyle (optional)
-          </h3>
+          <h3 className="eyebrow mb-4">03 — Lifestyle (optional)</h3>
           <div className="grid grid-cols-2 gap-4">
             <label className="text-caption uppercase tracking-wide text-black/60">
               Sleep (hrs)
@@ -185,14 +183,14 @@ export default function ScanPage({ onLogged }) {
       {/* RIGHT: the essentials only */}
       <section className="space-y-6">
         {!result ? (
-          <div className="flex min-h-[420px] flex-col items-center justify-center rounded-card border border-purple-400 p-10 text-center">
-            <span className="mb-4 text-caption uppercase tracking-[0.25em] text-purple-600">
+          <div className="panel flex min-h-[420px] flex-col items-center justify-center p-10 text-center">
+            <span className="mb-4 text-caption uppercase tracking-[0.25em] text-purple-700">
               Awaiting input
             </span>
-            <p className="max-w-sm text-subheading text-black/60">
+            <p className="max-w-sm font-sans text-subheading leading-snug text-ink/65">
               Capture a photo, log what you used today, then press{" "}
-              <span className="text-black">analyze skin</span> for your four scores, how they moved,
-              and what to do next.
+              <span className="font-display italic text-ink">analyze skin</span> for your four
+              scores, how they moved, and what to do next.
             </p>
           </div>
         ) : (

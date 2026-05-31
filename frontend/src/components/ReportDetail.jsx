@@ -1,7 +1,12 @@
 import React from "react";
 import { Microscope, Package, Moon } from "lucide-react";
 import SpectrumDashboard from "./SpectrumDashboard";
+import Polaroid from "./Polaroid";
 import { IngredientScore, Warnings, Schedule, Recommendations } from "./InsightsPanels";
+
+function fmtDay(iso) {
+  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
 
 // Friendly labels + descriptions for the raw, interpretable CV features so the
 // full report can expose the evidence behind every score.
@@ -131,10 +136,13 @@ export default function ReportDetail({ report }) {
   return (
     <div className="space-y-6">
       {photoThumb && (
-        <img
+        <Polaroid
           src={photoThumb}
           alt={`Face on ${report.date}`}
-          className="h-40 w-40 rounded-card border border-purple-200 object-cover"
+          caption={fmtDay(report.date)}
+          rotate={-2}
+          tape
+          className="[&>.polaroid-photo]:h-40 [&>.polaroid-photo]:w-40"
         />
       )}
       <SpectrumDashboard analysis={result.analysis} />

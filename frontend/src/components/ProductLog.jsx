@@ -57,7 +57,7 @@ export default function ProductLog({ products, setProducts }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-caption uppercase tracking-[0.2em] text-black">Today's products</h3>
+        <h3 className="eyebrow">02 — Today's products</h3>
         <button onClick={() => setManual((v) => !v)} className="btn-flat">
           <PencilLine className="h-3 w-3" /> {manual ? "search instead" : "enter manually"}
         </button>

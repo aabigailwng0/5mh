@@ -33,25 +33,31 @@ export default function CameraCapture({ onPhoto, preview }) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-5">
-      <div className="relative h-[300px] w-[300px] overflow-hidden rounded-card border border-purple-400 bg-white">
-        {preview ? (
-          <img src={preview} alt="Captured face" className="h-full w-full object-cover" />
-        ) : useUpload ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-black/60">
-            <Upload className="h-9 w-9" />
-            <span className="text-caption uppercase tracking-wide">Choose a photo</span>
-          </div>
-        ) : (
-          <Webcam
-            ref={webcamRef}
-            audio={false}
-            mirrored
-            screenshotFormat="image/jpeg"
-            videoConstraints={videoConstraints}
-            className="h-full w-full object-cover"
-          />
-        )}
+    <div className="flex flex-col items-center gap-6">
+      <div className="polaroid relative rotate-[-2deg]">
+        <span className="tape" style={{ top: -10, left: "50%", marginLeft: -40 }} />
+        <div className="relative h-[272px] w-[272px] overflow-hidden bg-ink/5">
+          {preview ? (
+            <img src={preview} alt="Captured face" className="h-full w-full object-cover" />
+          ) : useUpload ? (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-ink/55">
+              <Upload className="h-9 w-9" strokeWidth={1.25} />
+              <span className="text-caption uppercase tracking-wide">Choose a photo</span>
+            </div>
+          ) : (
+            <Webcam
+              ref={webcamRef}
+              audio={false}
+              mirrored
+              screenshotFormat="image/jpeg"
+              videoConstraints={videoConstraints}
+              className="h-full w-full object-cover"
+            />
+          )}
+        </div>
+        <span className="polaroid-caption">
+          {preview ? "today \u00b7 your face" : useUpload ? "upload a photo" : "live \u00b7 smile"}
+        </span>
       </div>
 
       <div className="flex items-center gap-4">
