@@ -8,6 +8,7 @@ with standardized ingredient lists (water removed, duplicates normalized).
 
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
@@ -57,22 +58,22 @@ class KaggleCatalog:
                 self._products.append(product)
 
     def _row_to_product(self, row: pd.Series, idx: int) -> Product | None:
-        raw_ing = (row.get("ingredients") or "").strip()
+        raw_ing = (row.get("clean_ingreds") or row.get("ingredients") or "").strip()
         if not raw_ing or raw_ing.lower() in ("null", "none", ""):
             # No ingredient list = useless for our scoring, skip it.
             return None
 
-        name = (row.get("Product_name") or row.get("product_name") or "").strip()
+        name = (row.get("product_name") or row.get("Product_name") or "").strip()
         if not name:
             # Fallback: derive from URL if available
-            url = (row.get("Product_url") or row.get("product_url") or "").strip()
+            url = (row.get("product_url") or row.get("Product_url") or "").strip()
             name = self._name_from_url(url)
         if not name:
             return None
 
-        product_type = (row.get("Product_type") or row.get("product_type") or "").strip()
+        product_type = (row.get("product_type") or row.get("Product_type") or "").strip()
         category = self._infer_category(product_type)
-        price = (row.get("Price") or row.get("price") or "").strip()
+        price = (row.get("price") or row.get("Price") or "").strip()
 
         return Product(
             name=name,
@@ -90,8 +91,15 @@ class KaggleCatalog:
     # ----------------------------------------------------------- field parsers
     @staticmethod
     def _split_ingredients(raw: str) -> list[str]:
-        # Kaggle data already has standardized ingredient lists
-        # Split on commas, drop empties and whitespace
+        # Kaggle data stores ingredients as Python list string format: "['ing1', 'ing2']"
+        # Try to parse as Python list first; fall back to comma-split if that fails
+        try:
+            parsed = ast.literal_eval(raw)
+            if isinstance(parsed, list):
+                return [str(ing).strip() for ing in parsed if ing]
+        except (ValueError, SyntaxError):
+            pass
+        # Fallback: split on commas
         tokens = [t.strip() for t in raw.split(",") if t.strip()]
         return tokens
 

@@ -20,6 +20,19 @@ _BARCODE_URL = "https://world.openbeautyfacts.org/api/v2/product/{barcode}.json"
 _SEARCH_URL = "https://world.openbeautyfacts.org/cgi/search.pl"
 _HEADERS = {"User-Agent": "Skinalizer/0.1 (hackathon skincare engine)"}
 
+# Skincare-only category keywords (blocks makeup, fragrance, etc.)
+_SKINCARE_KEYWORDS = [
+    "sunscreen", "spf", "cleanser", "toner", "essence", "exfoliant", "peeling",
+    "serum", "ampoule", "eye cream", "eye care", "mask", "face oil", "moisturizer",
+    "moisturiser", "cream", "lotion", "hydrating", "treatment", "care", "skincare"
+]
+_NONSKINCARE_KEYWORDS = [
+    "makeup", "lipstick", "foundation", "concealer", "mascara", "eyeshadow", "blush",
+    "bronzer", "highlighter", "primer", "bb cream", "cc cream", "fragrance", "perfume",
+    "cologne", "bath", "shower", "soap", "hair care", "shampoo", "conditioner",
+    "nail", "tools", "accessories"
+]
+
 
 class OpenBeautyFactsClient:
     """Thin, cached wrapper around the Open Beauty Facts REST API."""
@@ -89,8 +102,32 @@ class OpenBeautyFactsClient:
         return out
 
     # ------------------------------------------------------------------ helpers
+    @staticmethod
+    def _is_skincare_product(prod: dict) -> bool:
+        """Check if a product is skincare-focused (not makeup/fragrance/hair)."""
+        # Check categories and name for non-skincare keywords
+        categories = (prod.get("categories") or "").lower()
+        name = (prod.get("product_name") or "").lower()
+        combined = f"{categories} {name}"
+        
+        # Reject if any non-skincare keyword is present
+        for keyword in _NONSKINCARE_KEYWORDS:
+            if keyword in combined:
+                return False
+        
+        # Accept if any skincare keyword is present
+        for keyword in _SKINCARE_KEYWORDS:
+            if keyword in combined:
+                return True
+        
+        # Default: accept if has ingredient list (likely a skincare product)
+        ingredients = prod.get("ingredients") or prod.get("ingredients_text") or ""
+        return bool(ingredients)
+
     def _parse_product(self, payload: dict, barcode: str) -> Product | None:
         prod = payload.get("product", {})
+        if not self._is_skincare_product(prod):
+            return None
         ingredients = self._extract_ingredients(prod)
         if not ingredients:
             return None

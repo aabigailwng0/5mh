@@ -33,7 +33,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-black">
-      {/* Top nav with real page switching */}
+      {/* Top nav with real page switching; logo + design language from main */}
       <nav className="sticky top-0 z-20 h-28 border-b border-purple-400 bg-white/90 backdrop-blur">
         <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-6">
           <img src="/mh_logo.png" alt="GLOW" className="h-24 w-auto object-contain" />
