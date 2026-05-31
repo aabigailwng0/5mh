@@ -17,3 +17,9 @@ statsmodels==0.14.2
 # The engine runs fully without this; install only if you want to plug in the
 # shipped Keras model as a refinement signal for the acne axis.
 # tensorflow==2.16.1
+
+# --- OPTIONAL: LLM vision scorer (score the four axes with Claude or Gemini). ---
+# Install the SDK for whichever provider you set via SKINALIZER_LLM_PROVIDER.
+# Without these (or without an API key) the engine stays on the CV scorer.
+# anthropic==0.34.2              # SKINALIZER_LLM_PROVIDER=anthropic  (+ ANTHROPIC_API_KEY)
+# google-generativeai==0.7.2     # SKINALIZER_LLM_PROVIDER=gemini     (+ GEMINI_API_KEY)

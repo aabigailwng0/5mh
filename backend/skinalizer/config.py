@@ -76,6 +76,21 @@ class EngineConfig:
     # transparent feature score (0 = ignore CNN, 1 = trust CNN fully).
     classifier_blend_weight: float = 0.45
 
+    # --- Optional LLM vision scorer (Claude / Gemini) ---
+    # When a provider + API key are configured, the four bare-skin axes are
+    # scored by a multimodal LLM instead of the OpenCV feature scorer (the rest
+    # of the pipeline is unchanged). Leave the provider unset to stay fully
+    # offline on the transparent CV scorer. Configure via env:
+    #   SKINALIZER_LLM_PROVIDER = anthropic | gemini
+    #   SKINALIZER_LLM_MODEL    = (optional) override the default model id
+    #   ANTHROPIC_API_KEY / GEMINI_API_KEY (or SKINALIZER_LLM_API_KEY)
+    llm_provider: str | None = field(
+        default_factory=lambda: (os.environ.get("SKINALIZER_LLM_PROVIDER") or "").strip() or None
+    )
+    llm_model: str | None = field(
+        default_factory=lambda: (os.environ.get("SKINALIZER_LLM_MODEL") or "").strip() or None
+    )
+
     # --- Attribution (stretch) ---
     # Minimum number of daily entries before we attempt regression attribution.
     min_entries_for_attribution: int = 10
