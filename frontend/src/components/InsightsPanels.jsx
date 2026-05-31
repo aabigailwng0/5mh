@@ -157,12 +157,8 @@ export function Recommendations({ recommendations }) {
         {recommendations.map((r, i) => (
           <div key={i} className="flex items-start gap-3">
             <span
-              className={`mt-0.5 shrink-0 rounded border px-1.5 py-0.5 text-caption uppercase tracking-wide ${
-                r.kind === "product"
-                  ? "border-burnt-sienna text-burnt-sienna"
-                  : "border-cork-shadow text-warm-cream/70"
-              }`}
-            >
+              className="mt-0.5 shrink-0 w-24 text-center rounded-full border border-purple-600 bg-purple-50 px-2 py-0.5 text-caption uppercase tracking-wide text-black"
+              >
               {r.kind}
             </span>
             <div>

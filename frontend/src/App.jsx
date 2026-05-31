@@ -67,11 +67,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-black">
-      {/* Top-fixed minimal nav */}
-      <nav className="sticky top-0 z-20 border-b border-purple-400 bg-white/90 back
+      <nav className="sticky top-0 z-20 h-28 border-b border-purple-400 bg-white/90 back
       op-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-subheading font-medium tracking-tight">GLOW</span>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
+          <img
+            src="/mh_logo.png"
+            alt="GLOW"
+            className="h-24 w-auto object-contain"
+          />
           <div className="hidden gap-6 text-caption uppercase tracking-[0.18em] text-black sm:flex">
             <span>Scan</span>
             <span>Sustain</span>
