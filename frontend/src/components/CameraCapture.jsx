@@ -40,7 +40,7 @@ export default function CameraCapture({ onPhoto, preview }) {
         ) : useUpload ? (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-grey-brown">
             <Upload className="h-9 w-9" />
-            <span className="text-caption uppercase tracking-wide">Choose a face photo</span>
+            <span className="text-caption uppercase tracking-wide">Choose a photo</span>
           </div>
         ) : (
           <Webcam
@@ -57,18 +57,18 @@ export default function CameraCapture({ onPhoto, preview }) {
       <div className="flex items-center gap-4">
         {preview ? (
           <button onClick={() => onPhoto(null, null)} className="btn-ghost">
-            <RefreshCw className="h-4 w-4" /> Retake
+            <RefreshCw className="h-4 w-4" /> RETAKE
           </button>
         ) : useUpload ? (
           <>
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={onFile} />
             <button onClick={() => fileRef.current?.click()} className="btn-primary">
-              <Upload className="h-4 w-4" /> Upload photo
+              <Upload className="h-4 w-4" /> UPLOAD PHOTO
             </button>
           </>
         ) : (
           <button onClick={capture} className="btn-primary">
-            <Camera className="h-4 w-4" /> Capture
+            <Camera className="h-4 w-4" /> TAKE PHOTO
           </button>
         )}
         <button onClick={() => setUseUpload((v) => !v)} className="btn-flat">

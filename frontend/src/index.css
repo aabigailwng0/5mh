@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 /* Studio canvas: warm near-black, single warm-cream foreground. No gradient. */

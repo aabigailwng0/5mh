@@ -92,12 +92,12 @@ export default function ProductLog({ products, setProducts }) {
           <textarea
             value={manualIng}
             onChange={(e) => setManualIng(e.target.value)}
-            placeholder="Paste the INCI ingredient list (comma separated)…"
+            placeholder="Paste the ingredient list of your product (comma separated)"
             rows={3}
             className="input-line resize-none"
           />
           <button onClick={addManual} className="btn-ghost self-end">
-            <Plus className="h-4 w-4" /> Add
+            <Plus className="h-4 w-4" /> ADD
           </button>
         </div>
       ) : (
@@ -107,7 +107,7 @@ export default function ProductLog({ products, setProducts }) {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products (e.g. CeraVe, retinol serum)…"
+              placeholder="Search products (e.g. CeraVe, Retinol, Cleanser)…"
               className="w-full bg-transparent text-body text-warm-cream outline-none placeholder:text-warm-cream/35"
             />
           </div>

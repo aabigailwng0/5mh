@@ -70,25 +70,24 @@ export default function App() {
       {/* Top-fixed minimal nav */}
       <nav className="sticky top-0 z-20 border-b border-cork-shadow bg-studio-black/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <span className="text-subheading font-medium tracking-tight">SKINALIZER</span>
+          <span className="text-subheading font-medium tracking-tight">GLOW</span>
           <div className="hidden gap-6 text-caption uppercase tracking-[0.18em] text-warm-cream/80 sm:flex">
-            <span>Spectrum</span>
-            <span>Products</span>
-            <span>Attribution</span>
+            <span>Scan</span>
+            <span>Sustain</span>
+            <span>Share</span>
           </div>
         </div>
       </nav>
 
       <header className="mx-auto max-w-6xl px-6 pb-8 pt-12">
         <h1 className="max-w-3xl font-display text-heading-lg font-medium leading-[0.92] tracking-tight md:text-display">
-          Your face, priced daily.
+          glow
         </h1>
         <p className="mt-5 max-w-xl text-subheading text-warm-cream/70">
-          One photo and your product log → an explainable read on four skin spectrums, the
-          ingredient loads driving them, and the drivers attributed over time.
+          Your personal skin intelligence platform, so you can <strong>keep glowing</strong>. 
+          Upload one photo and log your products to receive customized insights, recommendations, and tracking.
         </p>
         <span className="mt-4 inline-block text-caption uppercase tracking-[0.2em] text-burnt-sienna">
-          ORYZO-grade · transparent by design
         </span>
       </header>
 
@@ -137,7 +136,7 @@ export default function App() {
           <div className="flex gap-3">
             <button onClick={runAnalyze} disabled={loading} className="btn-primary flex-1">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-              {loading ? "Analyzing" : "Analyze skin"}
+              {loading ? "Analyzing" : "ANALYZE SKIN"}
             </button>
             {result && (
               <button onClick={saveToday} className="btn-ghost">
@@ -156,9 +155,9 @@ export default function App() {
                 Awaiting input
               </span>
               <p className="max-w-sm text-subheading text-warm-cream/60">
-                Capture a photo, log what you used today, then run{" "}
-                <span className="text-warm-cream">Analyze skin</span> to see your spectrum,
-                ingredient loads, clashes and routine.
+                Capture a photo, log what you used today, then press{" "}
+                <span className="text-warm-cream">analyze skin</span> to see your personalized 
+                insights including ingredient clashes, product recommendations, and more.
               </p>
             </div>
           ) : (
