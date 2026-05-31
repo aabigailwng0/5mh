@@ -58,12 +58,14 @@ def create_app() -> FastAPI:
     @app.get("/api/health")
     def health() -> dict:
         classifier = engine.skin_scorer._classifier  # noqa: SLF001
+        vision = engine.vision_scorer
         return {
             "status": "ok",
             "catalog_products": len(engine.catalog),
             "kaggle_products": len(engine.kaggle_catalog),
             "ingredients_known": len(engine.knowledge_base.all_ingredients()),
             "classifier_backend": bool(classifier and classifier.available),
+            "llm_scorer": (f"{vision.provider}:{vision.model}" if vision else None),
             "entries_logged": engine.log_store.count(),
         }
 

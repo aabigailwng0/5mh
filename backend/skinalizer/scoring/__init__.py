@@ -3,6 +3,7 @@
 from .features import FeatureExtractor, SkinFeatures
 from .scorer import SkinScorer
 from .classifier_backend import ClassifierBackend, KerasClassifierBackend
+from .llm_scorer import LLMVisionScorer
 
 __all__ = [
     "FeatureExtractor",
@@ -10,4 +11,5 @@ __all__ = [
     "SkinScorer",
     "ClassifierBackend",
     "KerasClassifierBackend",
+    "LLMVisionScorer",
 ]

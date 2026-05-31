@@ -25,7 +25,7 @@ from .ingredients import IngredientKnowledgeBase, IngredientScorer, InteractionT
 from .models import Product, SkinAxis
 from .products import KaggleCatalog, OpenBeautyFactsClient, ProductResolver, SephoraCatalog
 from .recommendations import Recommender, ScheduleBuilder, WarningService
-from .scoring import FeatureExtractor, KerasClassifierBackend, SkinScorer
+from .scoring import FeatureExtractor, KerasClassifierBackend, LLMVisionScorer, SkinScorer
 from .storage import DailyLogStore
 
 
@@ -57,6 +57,17 @@ class SkinalizerEngine:
         if self.config.keras_model_path is not None:
             classifier = KerasClassifierBackend(self.config.keras_model_path)
         self.skin_scorer = SkinScorer(classifier, self.config.classifier_blend_weight)
+
+        # Optional LLM vision scorer (Claude / Gemini). Used in place of the CV
+        # scorer for the four bare-skin axes when a provider + key are set; the
+        # rest of the pipeline (products, warnings, attribution) is unchanged.
+        self.vision_scorer = None
+        if self.config.llm_provider:
+            scorer = LLMVisionScorer(
+                provider=self.config.llm_provider,
+                model=self.config.llm_model,
+            )
+            self.vision_scorer = scorer if scorer.available else None
 
         # --- recommendations ---
         self.schedule_builder = ScheduleBuilder(self.config.routine_rules_json, self.knowledge_base)
@@ -108,12 +119,23 @@ class SkinalizerEngine:
         bgr = self.feature_extractor.decode(image_bytes)
         features = self.feature_extractor.extract(bgr)
 
-        # Let the optional CNN see the same frame before scoring.
-        classifier = self.skin_scorer._classifier  # noqa: SLF001 (internal handoff)
-        if classifier is not None and classifier.available:
-            classifier.prepare(bgr)
+        # Prefer the LLM vision scorer when configured; otherwise use the
+        # transparent CV scorer (optionally refined by the pretrained CNN).
+        analysis = None
+        if self.vision_scorer is not None and self.vision_scorer.available:
+            try:
+                analysis = self.vision_scorer.score(image_bytes, features)
+            except Exception as exc:  # network / parse error -> fall back to CV
+                analysis = None
+                print(f"[engine] LLM scorer failed, falling back to CV ({exc!s})")
 
-        analysis = self.skin_scorer.score(features)
+        if analysis is None:
+            # Let the optional CNN see the same frame before scoring.
+            classifier = self.skin_scorer._classifier  # noqa: SLF001 (internal handoff)
+            if classifier is not None and classifier.available:
+                classifier.prepare(bgr)
+            analysis = self.skin_scorer.score(features)
+
         ingredient_score = self.ingredient_scorer.score(products)
         benefit_by_axis = self._benefit_by_axis(products)
         analysis = self.skin_scorer.factor_in_products(analysis, ingredient_score, benefit_by_axis)
