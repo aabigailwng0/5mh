@@ -39,9 +39,25 @@ function lerpHex(a, b, t) {
   return `#${out.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 }
 
+function problemColor(value) {
+  if (value < 25) return "#22c55e"; 
+  if (value < 50) return "#eab308"; 
+  if (value < 75) return "#f97316"; 
+  return "#ef4444";
+}
+
+function hydrationColor(value) {
+  if (value < 25) return "#ef4444"; 
+  if (value < 50) return "#f97316";
+  if (value < 75) return "#eab308";
+  return "#22c55e"; 
+}
+
 function barColor(value, goodIsHigh) {
-  const severity = (goodIsHigh ? 100 - value : value) / 100; // 0 calm -> 1 hot
-  return lerpHex("6c5f51", "dc5000", Math.max(0, Math.min(1, severity)));
+  if (goodIsHigh) { 
+    return hydrationColor(value); 
+  }
+  return problemColor(value); 
 }
 
 function AxisCard({ axisKey, data }) {

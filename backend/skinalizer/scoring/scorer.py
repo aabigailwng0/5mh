@@ -196,24 +196,20 @@ class SkinScorer:
     # ------------------------------------------------------------------ labels
     @staticmethod
     def _label_problem(value: float) -> str:
-        if value < 15:
-            return "clear"
-        if value < 35:
+        if value < 25:
             return "minimal"
-        if value < 55:
+        if value < 50:
             return "mild"
         if value < 75:
             return "moderate"
-        return "significant"
+        return "severe"
 
     @staticmethod
     def _label_hydration(value: float) -> str:
         if value < 25:
             return "very dry"
-        if value < 45:
+        if value < 50:
             return "dry"
-        if value < 65:
-            return "balanced"
-        if value < 85:
+        if value < 75:
             return "hydrated"
         return "very hydrated"

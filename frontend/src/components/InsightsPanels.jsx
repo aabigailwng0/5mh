@@ -36,7 +36,7 @@ export function IngredientScore({ score }) {
   return (
     <div className="panel">
       <SectionLabel icon={FlaskConical}>Ingredient load (from your products)</SectionLabel>
-      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-card border border-purple-400 bg-purple-100">
+      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-card border border-purple-400 bg-purple-300">
         {items.map((it) => (
           <div key={it.label} className="bg-studio-black p-4 text-center">
             <div className="font-display text-heading-sm font-medium text-black">
@@ -69,7 +69,7 @@ export function Warnings({ warnings }) {
   if (!warnings) return null;
   return (
     <div className="panel">
-      <SectionLabel icon={AlertTriangle} accent="text-purple-600">
+      <SectionLabel icon={AlertTriangle} accent="text-black">
         Interaction warnings
       </SectionLabel>
       {warnings.length === 0 ? (
@@ -150,7 +150,7 @@ export function Recommendations({ recommendations }) {
   if (!recommendations) return null;
   return (
     <div className="panel">
-      <SectionLabel icon={Lightbulb} accent="text-burnt-sienna">
+      <SectionLabel icon={Lightbulb} accent="text-black">
         Recommendations
       </SectionLabel>
       <div className="space-y-3">
