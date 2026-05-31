@@ -1,0 +1,60 @@
+{
+  "_comment": "Drives the AM/PM schedule builder. step_order is the canonical layering sequence (thin -> thick, SPF last). category_to_step maps a product category onto a step. active_timing nudges specific actives to a preferred time of day.",
+  "step_order": [
+    "cleanser",
+    "toner",
+    "treatment",
+    "serum",
+    "eye_cream",
+    "moisturiser",
+    "face_oil",
+    "sunscreen"
+  ],
+  "category_to_step": {
+    "cleanser": "cleanser",
+    "face wash": "cleanser",
+    "micellar": "cleanser",
+    "toner": "toner",
+    "essence": "toner",
+    "exfoliant": "treatment",
+    "treatment": "treatment",
+    "serum": "serum",
+    "ampoule": "serum",
+    "eye cream": "eye_cream",
+    "eye_cream": "eye_cream",
+    "moisturiser": "moisturiser",
+    "moisturizer": "moisturiser",
+    "cream": "moisturiser",
+    "lotion": "moisturiser",
+    "gel": "moisturiser",
+    "face oil": "face_oil",
+    "oil": "face_oil",
+    "sunscreen": "sunscreen",
+    "spf": "sunscreen",
+    "mask": "treatment"
+  },
+  "active_timing": {
+    "retinol": "pm",
+    "retinaldehyde": "pm",
+    "tretinoin": "pm",
+    "adapalene": "pm",
+    "retinyl palmitate": "pm",
+    "glycolic acid": "pm",
+    "lactic acid": "pm",
+    "salicylic acid": "any",
+    "benzoyl peroxide": "any",
+    "ascorbic acid": "am",
+    "sodium ascorbyl phosphate": "am",
+    "niacinamide": "any"
+  },
+  "step_labels": {
+    "cleanser": "Cleanse",
+    "toner": "Tone / prep",
+    "treatment": "Active treatment",
+    "serum": "Serum",
+    "eye_cream": "Eye cream",
+    "moisturiser": "Moisturise",
+    "face_oil": "Face oil",
+    "sunscreen": "Sunscreen (AM only)"
+  }
+}

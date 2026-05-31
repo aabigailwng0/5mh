@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+/* Studio canvas: warm near-black, single warm-cream foreground. No gradient. */
+body {
+  margin: 0;
+  background: #100904;
+  min-height: 100vh;
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  color: #ffedd7;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #dc5000;
+  color: #ffedd7;
+}
+
+@layer components {
+  /* Bordered ghost container — no fill, no shadow; structure via hairline. */
+  .panel {
+    @apply rounded-card border border-cork-shadow p-6 bg-transparent;
+  }
+
+  /* Primary action: contained warm-brown swatch + burnt-sienna hairline. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-burnt-sienna
+      bg-dark-cork px-6 py-3 text-body font-medium text-warm-cream transition-colors
+      duration-200 hover:bg-[#46301c] disabled:opacity-50;
+  }
+
+  /* Outlined ghost pill — transparent, cream outline, sienna on hover. */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-rounded border border-warm-cream
+      bg-transparent px-5 py-2 text-body text-warm-cream transition-colors duration-300
+      hover:border-burnt-sienna;
+  }
+
+  /* Flat inline text action — underlined link with button semantics. */
+  .btn-flat {
+    @apply inline-flex items-center gap-1 border-b border-warm-cream bg-transparent pb-0.5
+      text-caption uppercase tracking-wide text-warm-cream transition-colors duration-200
+      hover:border-burnt-sienna hover:text-burnt-sienna;
+  }
+
+  /* Single-line entry: bottom-border only, sharp corners. */
+  .input-line {
+    @apply w-full rounded-none border-0 border-b border-warm-cream/50 bg-transparent px-1 py-1.5
+      text-body text-warm-cream outline-none transition-colors duration-200
+      placeholder:text-warm-cream/35 focus:border-burnt-sienna;
+  }
+
+  /* Dashed spatial divider. */
+  .divider {
+    @apply border-0 border-t border-dashed border-cork-shadow;
+  }
+}
+
+/* Smooth fill animation for spectrum bars. */
+.spectrum-fill {
+  transition: width 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}

@@ -1,0 +1,30 @@
+# --- Reference material (not ours to redistribute) ---
+other-people-codes/
+
+# --- Large datasets (≈343 MB). The small Sephora catalogue is bundled inside
+#     backend/skinalizer/data/ so the app runs without this folder. ---
+startingplace-datasets/
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- Backend runtime state (daily log + OBF cache + uploads) ---
+backend/storage_data/
+backend/tests/_smoke_storage/
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+frontend/dist-electron/
+*.log
+
+# --- OS / editor ---
+.DS_Store
+.idea/
+.vscode/
+*.swp

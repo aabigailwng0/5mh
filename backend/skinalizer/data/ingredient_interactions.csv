@@ -1,0 +1,8 @@
+ingredient_a,ingredient_b,problem_when_combined,severity,recommendation
+retinoid,aha,Layering a retinoid with an AHA in the same routine compounds exfoliation and commonly causes irritation and a compromised barrier,high,Alternate on different nights rather than stacking
+retinoid,bha,Retinoids with BHA in the same routine increase irritation and dryness for most people,moderate,Use the BHA in the morning or on alternate nights
+retinoid,benzoyl peroxide,"Benzoyl peroxide oxidises and deactivates many retinoids (notably tretinoin) when applied together, reducing efficacy",high,Apply at different times of day (e.g. BPO AM, retinoid PM)
+benzoyl peroxide,ascorbic acid,Benzoyl peroxide can oxidise pure vitamin C (ascorbic acid) applied at the same time, blunting both,moderate,Separate into AM and PM routines
+aha,bha,Combining an AHA and a BHA in the same step doubles up exfoliating acids and frequently over-exfoliates skin,moderate,Limit to one acid per routine or alternate days
+retinoid,retinoid,Using two different retinoid products together multiplies strength and the risk of retinoid dermatitis,moderate,Pick a single retinoid product
+aha,benzoyl peroxide,Stacking an AHA with benzoyl peroxide is a strong combined irritant load and can over-dry the skin,moderate,Alternate nights and buffer with moisturiser
