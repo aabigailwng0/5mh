@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TrendingUp, ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { getAttribution, getHistory } from "../api";
 import ImpactChart from "./ImpactChart";
 import TrendChart from "./TrendChart";
@@ -22,7 +22,7 @@ function Stat({ label, value }) {
   return (
     <div>
       <div className="font-display text-heading-sm font-medium leading-none">{value}</div>
-      <div className="mt-1 text-caption uppercase tracking-wide text-black/55">{label}</div>
+      <div className="mt-1 text-caption uppercase tracking-wide text-ink/55">{label}</div>
     </div>
   );
 }
@@ -34,30 +34,30 @@ function DriverRow({ d }) {
   const sign = d.effect > 0 ? "+" : "";
   const [lo, hi] = d.effect_ci;
   const fill = d.significant ? "#7c3aed" : "#c4b5fd";
-  const textColor = d.significant ? "text-black" : "text-black/45";
+  const textColor = d.significant ? "text-ink" : "text-ink/45";
 
   return (
-    <div className="space-y-1.5 border-t border-purple-200 py-3 first:border-t-0 first:pt-0">
+    <div className="space-y-1.5 border-t border-ink/12 py-3 first:border-t-0 first:pt-0">
       <div className="flex items-baseline justify-between gap-3">
-        <span className={`text-body font-medium ${textColor}`}>{d.label}</span>
+        <span className={`font-sans text-body font-medium ${textColor}`}>{d.label}</span>
         <span className={`whitespace-nowrap font-display text-body ${textColor}`}>
           {sign}
-          {d.effect} <span className="text-caption text-black/50">pts {raises ? "↑" : "↓"}</span>
+          {d.effect} <span className="text-caption text-ink/50">pts {raises ? "↑" : "↓"}</span>
         </span>
       </div>
       <div className="flex items-center gap-3">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-purple-100">
+        <div className="h-1.5 flex-1 overflow-hidden bg-ink/10">
           <div
-            className="spectrum-fill h-full rounded-full"
+            className="spectrum-fill h-full"
             style={{ width: `${Math.round(d.importance * 100)}%`, backgroundColor: fill }}
           />
         </div>
-        <span className="w-28 text-right text-caption uppercase tracking-wide text-black/55">
+        <span className="w-28 text-right text-caption uppercase tracking-wide text-ink/55">
           p={d.p_value}
           {d.significant ? " ✓" : ""}
         </span>
       </div>
-      <div className="flex justify-between text-caption text-black/50">
+      <div className="flex justify-between text-caption text-ink/50">
         <span className="uppercase tracking-wide">{d.unit}</span>
         <span>
           95% CI {lo} … {hi}
@@ -98,21 +98,16 @@ export default function AttributionPanel() {
 
   return (
     <div className="panel">
-      {/* Header: title, axis picker */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-black/70" strokeWidth={1.5} />
-          <h3 className="text-caption uppercase tracking-[0.2em] text-black/70">Driver attribution</h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
+      {/* Header: kicker + axis picker (text, marked active) */}
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <h3 className="kicker">driver attribution</h3>
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
           {AXES.map((a) => (
             <button
               key={a}
               onClick={() => run(a, level)}
-              className={`rounded-rounded border px-2.5 py-1 text-caption uppercase tracking-wide transition-colors ${
-                axis === a && result
-                  ? "border-purple-600 text-purple-700"
-                  : "border-purple-300 text-black/60 hover:border-purple-500"
+              className={`font-mono text-caption uppercase tracking-[0.08em] transition-colors ${
+                axis === a && result ? "marker text-ink" : "text-ink/45 hover:text-ink"
               }`}
             >
               {a}
@@ -121,35 +116,35 @@ export default function AttributionPanel() {
         </div>
       </div>
 
-      {/* Level toggle: aggregate loads vs individual ingredients */}
-      <div className="mb-4 inline-flex rounded-rounded border border-purple-300 p-0.5">
-        {LEVELS.map((l) => (
-          <button
-            key={l.id}
-            onClick={() => run(axis, l.id)}
-            className={`rounded-[6px] px-3 py-1 text-caption uppercase tracking-wide transition-colors ${
-              level === l.id ? "bg-purple-200 text-black" : "text-black/55 hover:text-black"
-            }`}
-          >
-            {l.label}
-          </button>
+      {/* Level toggle as a typeset slash-switch */}
+      <div className="mb-5 flex items-center gap-2 font-mono text-caption uppercase tracking-[0.08em]">
+        {LEVELS.map((l, idx) => (
+          <React.Fragment key={l.id}>
+            {idx > 0 && <span className="text-ink/25">/</span>}
+            <button
+              onClick={() => run(axis, l.id)}
+              className={level === l.id ? "marker text-ink" : "text-ink/45 hover:text-ink"}
+            >
+              {l.label}
+            </button>
+          </React.Fragment>
         ))}
       </div>
 
       {!result && (
-        <p className="text-body text-black/55">
+        <p className="font-sans text-body text-ink/60">
           See what's driving your skin over time and which factors matter most (needs ~10 logged
-          days). Switch between aggregate <span className="text-black">loads</span> and individual{" "}
-          <span className="text-black">ingredients</span>.
+          days). Switch between aggregate <span className="text-ink">loads</span> and individual{" "}
+          <span className="text-ink">ingredients</span>.
         </p>
       )}
-      {loading && <p className="text-body text-black/60">Crunching the regression…</p>}
+      {loading && <p className="font-sans text-body italic text-ink/60">Crunching the regression…</p>}
 
       {result?.status === "insufficient_data" && (
-        <p className="text-body text-black/60">{result.message}</p>
+        <p className="font-sans text-body text-ink/60">{result.message}</p>
       )}
-      {result?.status === "no_target" && <p className="text-body text-black/60">{result.message}</p>}
-      {result?.status === "error" && <p className="text-body text-burnt-sienna">{result.message}</p>}
+      {result?.status === "no_target" && <p className="font-sans text-body text-ink/60">{result.message}</p>}
+      {result?.status === "error" && <p className="font-sans text-body text-purple-700">{result.message}</p>}
 
       {result?.status === "ok" && (
         <div className="space-y-6">
@@ -165,8 +160,8 @@ export default function AttributionPanel() {
           {/* Punchline */}
           <ul className="space-y-1.5">
             {result.narrative.map((line, i) => (
-              <li key={i} className="text-body text-black/80">
-                — {line}
+              <li key={i} className="font-display text-subheading italic leading-snug text-ink/80">
+                {line}
               </li>
             ))}
           </ul>
@@ -175,15 +170,15 @@ export default function AttributionPanel() {
           <ImpactChart drivers={result.drivers} axis={axis} />
 
           <div>
-            <div className="mb-2 text-caption uppercase tracking-wide text-black/55">Over time</div>
+            <h4 className="kicker mb-3">over time</h4>
             <TrendChart history={history} axis={axis} drivers={result.drivers} />
           </div>
 
           {/* Collapsible dense stats ("dev mode") */}
-          <div className="border-t border-purple-200 pt-3">
+          <div className="border-t border-ink/15 pt-3">
             <button
               onClick={() => setShowStats((s) => !s)}
-              className="flex items-center gap-1.5 text-caption uppercase tracking-wide text-black/55 hover:text-black"
+              className="flex items-center gap-1.5 font-mono text-caption uppercase tracking-wide text-ink/55 hover:text-ink"
             >
               {showStats ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
               Stats details
@@ -192,7 +187,7 @@ export default function AttributionPanel() {
             {showStats && (
               <div className="mt-4 space-y-5">
                 {/* Honest fit summary: CV R² headline, in-sample for contrast */}
-                <div className="grid grid-cols-4 gap-3 rounded-card border border-purple-200 p-4">
+                <div className="grid grid-cols-4 gap-3 border-y border-ink/15 py-4">
                   <Stat label="CV R²" value={fit.r2_cv_mean} />
                   <Stat label="in-sample R²" value={fit.r2_in_sample} />
                   <Stat label="days" value={result.entries} />
@@ -206,7 +201,7 @@ export default function AttributionPanel() {
                 </div>
 
                 {result.caveats?.length > 0 && (
-                  <ul className="list-inside list-disc space-y-1 border-t border-purple-200 pt-4 text-caption text-black/50">
+                  <ul className="list-inside list-disc space-y-1 border-t border-ink/15 pt-4 text-caption text-ink/50">
                     {result.caveats.map((c, i) => (
                       <li key={i}>{c}</li>
                     ))}

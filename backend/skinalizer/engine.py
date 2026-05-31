@@ -78,6 +78,7 @@ class SkinalizerEngine:
         self.attribution_engine = AttributionEngine(
             min_entries=self.config.min_entries_for_attribution,
             max_lag=self.config.max_lag_days,
+            long_window=self.config.long_term_window_days,
             ridge_alpha=self.config.attribution_ridge_alpha,
             n_bootstrap=self.config.attribution_bootstrap_samples,
             random_state=self.config.attribution_random_state,

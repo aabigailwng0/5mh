@@ -56,33 +56,40 @@ export default function ProductLog({ products, setProducts }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h3 className="eyebrow">02 — Today's products</h3>
+      <div className="flex items-baseline justify-between">
+        <h3 className="kicker">products</h3>
         <button onClick={() => setManual((v) => !v)} className="btn-flat">
           <PencilLine className="h-3 w-3" /> {manual ? "search instead" : "enter manually"}
         </button>
       </div>
 
-      {/* logged products */}
-      <div className="flex flex-wrap gap-2">
-        {products.length === 0 && (
-          <span className="text-body text-black/40">No products logged yet.</span>
+      {/* logged products — a typewritten list, like a packing slip */}
+      <div>
+        {products.length === 0 ? (
+          <span className="font-display text-body italic text-ink/40">Nothing logged yet.</span>
+        ) : (
+          <ul>
+            {products.map((p, i) => (
+              <li
+                key={i}
+                className="flex items-center justify-between gap-3 border-b border-ink/10 py-1.5 font-sans text-body text-ink"
+              >
+                <span className="min-w-0 flex-1 truncate">— {p.name}</span>
+                <button
+                  onClick={() => remove(i)}
+                  className="shrink-0 text-ink/35 transition-colors hover:text-purple-700"
+                  aria-label={`Remove ${p.name}`}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
-        {products.map((p, i) => (
-          <span
-            key={i}
-            className="flex items-center gap-2 rounded-rounded border border-purple-300 py-1.5 pl-3 pr-2 text-body"
-          >
-            {p.name}
-            <button onClick={() => remove(i)} className="text-black hover:text-purple-600">
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </span>
-        ))}
       </div>
 
       {manual ? (
-        <div className="flex flex-col gap-3 border-t border-dashed border-purple-300 pt-4">
+        <div className="flex flex-col gap-3 border-t border-dashed border-ink/20 pt-4">
           <input
             value={manualName}
             onChange={(e) => setManualName(e.target.value)}
@@ -102,27 +109,27 @@ export default function ProductLog({ products, setProducts }) {
         </div>
       ) : (
         <div className="relative">
-          <div className="flex items-center gap-2 border-b border-black/20 px-1 py-1.5">
-            <Search className="h-4 w-4 text-black" />
+          <div className="flex items-center gap-2 border-b border-ink/30 px-1 py-1.5">
+            <Search className="h-4 w-4 text-ink/70" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search products (e.g. CeraVe, Retinol, Cleanser)…"
-              className="w-full bg-transparent text-body text-black outline-none placeholder:text-black/35"
+              className="w-full bg-transparent font-sans text-body text-ink outline-none placeholder:text-ink/30"
             />
           </div>
           {results.length > 0 && (
-            <div className="absolute z-10 mt-1 max-h-64 w-full overflow-auto rounded-card border border-purple-400 bg-white">
+            <div className="absolute z-10 mt-1 max-h-64 w-full overflow-auto border border-ink/20 bg-paper-card shadow-[0_18px_34px_-20px_rgba(22,20,18,0.55)]">
               {results.map((p, i) => (
                 <button
                   key={i}
                   onClick={() => addCatalog(p)}
-                  className="w-full border-b border-purple-200 px-3 py-2 text-left transition-colors last:border-0 hover:bg-purple-50"
+                  className="w-full border-b border-ink/10 px-3 py-2 text-left transition-colors last:border-0 hover:bg-paper-2"
                 >
-                  <div className="text-body text-black">
+                  <div className="font-sans text-body text-ink">
                     {p.brand} {p.name}
                   </div>
-                  <div className="text-caption uppercase tracking-wide text-black/60">
+                  <div className="text-caption uppercase tracking-wide text-ink/55">
                     {p.category} · {p.raw_ingredients?.length || 0} ingredients · {p.source}
                   </div>
                 </button>

@@ -16,19 +16,19 @@ export default function HealthSummary({ delta, previousDate }) {
   const Icon = improved ? ArrowUpRight : worsened ? ArrowDownRight : Minus;
 
   return (
-    <div className="panel flex items-center justify-between">
+    <div className="panel flex items-end justify-between">
       <div>
-        <div className="text-caption uppercase tracking-[0.2em] text-black/55">Skin health</div>
-        <div className="mt-1 flex items-baseline gap-2">
+        <div className="kicker">skin health</div>
+        <div className="mt-2 flex items-baseline gap-2">
           <span className="font-display text-display font-medium leading-none">{score}</span>
-          <span className="text-subheading text-black/40">/100</span>
+          <span className="font-display text-subheading italic text-ink/40">/100</span>
         </div>
       </div>
 
       <div className="text-right">
         {change == null ? (
-          <span className="text-caption uppercase tracking-wide text-black/50">
-            First scan — no comparison yet
+          <span className="font-display text-body italic text-ink/50">
+            first scan — no comparison yet
           </span>
         ) : (
           <>
@@ -39,7 +39,7 @@ export default function HealthSummary({ delta, previousDate }) {
                 {change}
               </span>
             </div>
-            <div className="mt-1 text-caption uppercase tracking-wide text-black/50">
+            <div className="mt-1 text-caption uppercase tracking-wide text-ink/50">
               {improved ? "improved" : worsened ? "down" : "no change"}
               {previousDate ? ` vs ${fmtDate(previousDate)}` : " vs last scan"}
             </div>

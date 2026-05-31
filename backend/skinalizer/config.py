@@ -94,7 +94,13 @@ class EngineConfig:
     # --- Attribution (stretch) ---
     # Minimum number of daily entries before we attempt regression attribution.
     min_entries_for_attribution: int = 10
-    max_lag_days: int = 3
+    # Short-term lags to model explicitly (0..max_lag_days). Kept small because a
+    # real user only has a couple of weeks of history; wide lag windows overfit.
+    max_lag_days: int = 2
+    # A single "sustained" bucket averages exposure over days beyond the explicit
+    # lags (lag max_lag+1 .. long_term_window_days) to capture longer-term trends
+    # cheaply. Set to 0 (or <= max_lag_days) to disable.
+    long_term_window_days: int = 7
     # Ridge penalty strength (stabilises coefficients on short, collinear series).
     attribution_ridge_alpha: float = 1.0
     # Bootstrap resamples used to build per-driver confidence intervals / p-values.

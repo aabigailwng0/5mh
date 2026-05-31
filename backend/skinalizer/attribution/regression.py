@@ -53,6 +53,11 @@ _INGREDIENT_PREFIX = "ing:"
 # Significance threshold for flagging a driver as a "clear" effect.
 _ALPHA = 0.05
 
+# Sentinel "lag" for the sustained / long-term bucket (an average over the days
+# beyond the explicit short-term lags), distinguishing it from real day lags.
+_SUSTAINED = -1
+_SUSTAINED_SUFFIX = " (sustained)"
+
 
 class AttributionEngine:
     """Fits a per-axis distributed-lag Ridge model and attributes drivers.
@@ -62,7 +67,13 @@ class AttributionEngine:
     min_entries:
         Minimum logged days before attribution is attempted at all.
     max_lag:
-        Largest lag (in days) to build for each driver (0..max_lag inclusive).
+        Largest short-term lag (in days) to build for each driver
+        (0..max_lag inclusive).
+    long_window:
+        If greater than ``max_lag + 1``, add one extra "sustained" driver per
+        column: the average exposure over the days lagged ``max_lag+1 ..
+        long_window``. This captures longer-term trends with a single, smoothed
+        predictor instead of many noisy individual lags. Set to 0 to disable.
     ridge_alpha:
         L2 penalty strength; larger = more shrinkage / more stable coefficients.
     n_bootstrap:
@@ -74,16 +85,23 @@ class AttributionEngine:
     def __init__(
         self,
         min_entries: int = 10,
-        max_lag: int = 3,
+        max_lag: int = 2,
+        long_window: int = 7,
         ridge_alpha: float = 1.0,
         n_bootstrap: int = 500,
         random_state: int = 7,
     ):
         self._min_entries = min_entries
         self._max_lag = max_lag
+        self._long_window = long_window
         self._alpha = ridge_alpha
         self._n_bootstrap = n_bootstrap
         self._random_state = random_state
+
+    @property
+    def _has_sustained(self) -> bool:
+        """Whether a long-term bucket is configured and wider than the lags."""
+        return self._long_window > self._max_lag + 1
 
     # --------------------------------------------------------------- public API
     def analyze(
@@ -136,6 +154,7 @@ class AttributionEngine:
             "level": level,
             "entries": n,
             "max_lag": self._max_lag,
+            "long_window": self._long_window if self._has_sustained else None,
             "fit": fit,
             "drivers": drivers,
             "narrative": self._narrative(target_axis, drivers),
@@ -146,7 +165,8 @@ class AttributionEngine:
     def _build_lagged_design(
         self, df: pd.DataFrame, target_axis: str, level: str
     ) -> tuple[np.ndarray, list[str]]:
-        """Construct the lagged predictor matrix (lags 0..max_lag).
+        """Construct the lagged predictor matrix (lags 0..max_lag) plus, when
+        configured, one "sustained" long-term bucket per driver.
 
         Returns the design matrix in **raw units** (not yet standardised) plus
         the matching feature names, with zero-variance columns dropped.
@@ -159,6 +179,8 @@ class AttributionEngine:
                 shifted = np.roll(series, lag)
                 # Trim the wrapped-around head so only valid lagged rows remain.
                 columns[f"{col} (lag-{lag})"] = shifted[self._max_lag :]
+            if self._has_sustained:
+                columns[f"{col}{_SUSTAINED_SUFFIX}"] = self._sustained_column(series)
         if not columns:
             return np.empty((0, 0)), []
 
@@ -170,6 +192,23 @@ class AttributionEngine:
         matrix = matrix[:, keep]
         feature_names = [n for n, k in zip(feature_names, keep) if k]
         return matrix, feature_names
+
+    def _sustained_column(self, series: np.ndarray) -> np.ndarray:
+        """Average exposure over the *longer* tail (lags max_lag+1 .. long_window).
+
+        This is the long-term driver: rather than spending a separate coefficient
+        on each distant day (noisy and degrees-of-freedom hungry on short series),
+        we summarise sustained use with one smoothed predictor. Early rows simply
+        average whatever prior days exist (``min_periods=1``); days before logging
+        began count as no exposure (filled with 0). Aligned to the same trimmed
+        rows as the lag columns.
+        """
+        window = self._long_window - self._max_lag
+        s = pd.Series(series)
+        # Shift past the explicit lags, then average across the remaining window
+        # so row r sees the mean of days r-long_window .. r-(max_lag+1).
+        tail = s.shift(self._max_lag + 1).rolling(window=window, min_periods=1).mean()
+        return tail.fillna(0.0).to_numpy()[self._max_lag :]
 
     def _driver_columns(self, df: pd.DataFrame, level: str) -> list[str]:
         """Pick which numeric columns act as drivers for the requested level."""
@@ -258,7 +297,7 @@ class AttributionEngine:
                         else None
                     ),
                     "unit": self._unit(base_name),
-                    "lag_days": lag,
+                    "lag_days": None if lag == _SUSTAINED else lag,
                     "effect": round(effect, 3),
                     "effect_ci": [round(float(lo), 3), round(float(hi), 3)],
                     "p_value": round(p_value, 3),
@@ -324,7 +363,13 @@ class AttributionEngine:
     # ------------------------------------------------------------------ wording
     @staticmethod
     def _split_lag(feature_name: str) -> tuple[str, int]:
-        """Split ``"sleep_hours (lag-2)"`` -> ``("sleep_hours", 2)``."""
+        """Split a feature name into ``(base_column, lag)``.
+
+        ``"sleep_hours (lag-2)"`` -> ``("sleep_hours", 2)`` and
+        ``"sleep_hours (sustained)"`` -> ``("sleep_hours", _SUSTAINED)``.
+        """
+        if feature_name.endswith(_SUSTAINED_SUFFIX):
+            return feature_name[: -len(_SUSTAINED_SUFFIX)], _SUSTAINED
         if " (lag-" in feature_name:
             base, tail = feature_name.split(" (lag-", 1)
             return base, int(tail.rstrip(")"))
@@ -337,10 +382,20 @@ class AttributionEngine:
             return base_name[len(_INGREDIENT_PREFIX) :]
         return base_name.replace("_", " ")
 
-    @staticmethod
-    def _when(lag: int) -> str:
-        """Human phrasing for a lag, e.g. 0 -> 'same day', 2 -> '2 days later'."""
+    def _when(self, lag: int) -> str:
+        """Human phrasing for a lag, e.g. 0 -> 'same day', 2 -> '2 days later',
+        sustained -> 'sustained (prior week)'."""
+        if lag == _SUSTAINED:
+            return f"sustained ({self._sustained_span()})"
         return "same day" if lag == 0 else f"{lag} day{'s' if lag > 1 else ''} later"
+
+    def _sustained_span(self) -> str:
+        """Readable span covered by the sustained bucket, e.g. 'prior 3–7 days'."""
+        start = self._max_lag + 1
+        end = self._long_window
+        if start == end:
+            return f"{start} days earlier"
+        return f"prior {start}\u2013{end} days"
 
     @staticmethod
     def _kind(base_name: str) -> str:
@@ -353,10 +408,9 @@ class AttributionEngine:
             return "interaction"
         return "lifestyle"
 
-    @classmethod
-    def _humanize(cls, base_name: str, lag: int) -> str:
+    def _humanize(self, base_name: str, lag: int) -> str:
         """Short label: pretty driver name + when it acted."""
-        return f"{cls._pretty_name(base_name)} · {cls._when(lag)}"
+        return f"{self._pretty_name(base_name)} · {self._when(lag)}"
 
     @staticmethod
     def _unit(base_name: str) -> str:
@@ -369,9 +423,8 @@ class AttributionEngine:
             return f"per unit {base_name.replace('_', ' ')}"
         return f"per unit {base_name.replace('_', ' ')}"
 
-    @classmethod
     def _sentence(
-        cls,
+        self,
         base_name: str,
         lag: int,
         effect: float,
@@ -379,13 +432,31 @@ class AttributionEngine:
         target_axis: str,
     ) -> str:
         """One plain-English, real-units sentence describing the effect."""
-        name = cls._pretty_name(base_name)
+        name = self._pretty_name(base_name)
         verb = "raises" if effect > 0 else "lowers"
         mag = abs(effect)
-        when = "the same day" if lag == 0 else f"{lag} day{'s' if lag > 1 else ''} later"
         lo, hi = ci
         ci_txt = f"95% CI {lo:+.1f} to {hi:+.1f}"
 
+        # The sustained bucket reads as a longer-term trend, not a single-day lag.
+        if lag == _SUSTAINED:
+            span = self._sustained_span()
+            if base_name.startswith(_INGREDIENT_PREFIX):
+                return (
+                    f"Sustained use of {name} (averaged over the {span}) {verb} "
+                    f"{target_axis} by about {mag:.1f} points ({ci_txt})."
+                )
+            if base_name == "active_interaction_flag":
+                return (
+                    f"Sustained active-ingredient clashes (over the {span}) {verb} "
+                    f"{target_axis} by about {mag:.1f} points ({ci_txt})."
+                )
+            return (
+                f"A sustained level of {name} (over the {span}) {verb} "
+                f"{target_axis} by about {mag:.2f} points ({ci_txt})."
+            )
+
+        when = "the same day" if lag == 0 else f"{lag} day{'s' if lag > 1 else ''} later"
         if base_name.startswith(_INGREDIENT_PREFIX):
             return (
                 f"Using {name} {verb} {target_axis} by about {mag:.1f} points "

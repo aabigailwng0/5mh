@@ -6,6 +6,7 @@ import ScoreCards from "../components/ScoreCards";
 import HealthSummary from "../components/HealthSummary";
 import ActionList from "../components/ActionList";
 import ConfirmModal from "../components/ConfirmModal";
+import { Paperclip } from "../components/Fastener";
 import { analyze, logDay } from "../api";
 import {
   getPreviousReport,
@@ -17,6 +18,11 @@ import {
 import { deriveActions, healthDelta } from "../lib/insights";
 
 const TODAY = () => new Date().toISOString().slice(0, 10);
+const LOG_DATE = new Date().toLocaleDateString(undefined, {
+  weekday: "long",
+  month: "short",
+  day: "numeric",
+});
 
 export default function ScanPage({ onLogged }) {
   const [photo, setPhoto] = useState(null); // { blob, url }
@@ -118,79 +124,90 @@ export default function ScanPage({ onLogged }) {
 
   return (
     <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 pb-20 lg:grid-cols-[360px_1fr]">
-      {/* LEFT: input column */}
-      <section className="space-y-6">
-        <div className="panel">
-          <h2 className="eyebrow mb-5">01 — Today's photo</h2>
-          <CameraCapture onPhoto={onPhoto} preview={photo?.url} />
-        </div>
-
-        <div className="panel">
-          <ProductLog products={products} setProducts={setProducts} />
-        </div>
-
-        <div className="panel">
-          <h3 className="eyebrow mb-4">03 — Lifestyle (optional)</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <label className="text-caption uppercase tracking-wide text-black/60">
-              Sleep (hrs)
-              <input
-                type="number"
-                value={sleep}
-                onChange={(e) => setSleep(e.target.value)}
-                className="input-line mt-2"
-                placeholder="7.5"
-              />
-            </label>
-            <label className="text-caption uppercase tracking-wide text-black/60">
-              Dairy (servings)
-              <input
-                type="number"
-                value={dairy}
-                onChange={(e) => setDairy(e.target.value)}
-                className="input-line mt-2"
-                placeholder="1"
-              />
-            </label>
+      {/* LEFT: the day's log — one continuous sheet, sections set off by rules
+          and serif kickers rather than separate labelled boxes. */}
+      <section>
+        <div className="panel space-y-7">
+          <Paperclip className="-top-4 left-7 rotate-[-13deg]" />
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-display text-heading-sm font-medium italic">today's entry</h2>
+            <span className="eyebrow">{LOG_DATE}</span>
           </div>
-        </div>
 
-        <div className="flex gap-3">
-          <button onClick={runAnalyze} disabled={loading} className="btn-primary flex-1">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
-            {loading ? "Analyzing" : "ANALYZE SKIN"}
-          </button>
-          {result && (
-            <button
-              onClick={requestLog}
-              disabled={saving || saved}
-              className="inline-flex items-center justify-center gap-2 rounded-pill border border-purple-600 bg-purple-600 px-6 py-3 text-body font-medium text-white transition-colors hover:bg-purple-700 disabled:opacity-60"
-            >
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : saved ? (
-                <CheckCircle2 className="h-4 w-4" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              {saving ? "Saving" : saved ? "Saved" : "Log day"}
+          <CameraCapture onPhoto={onPhoto} preview={photo?.url} />
+
+          <hr className="rule" />
+          <ProductLog products={products} setProducts={setProducts} />
+
+          <hr className="rule" />
+          <div>
+            <div className="mb-4 flex items-baseline gap-2">
+              <h3 className="kicker">lifestyle</h3>
+              <span className="text-caption lowercase tracking-wide text-ink/35">if you kept track</span>
+            </div>
+            <div className="grid grid-cols-2 gap-5">
+              <label className="text-caption uppercase tracking-wide text-ink/55">
+                Sleep · hrs
+                <input
+                  type="number"
+                  value={sleep}
+                  onChange={(e) => setSleep(e.target.value)}
+                  className="input-line mt-2"
+                  placeholder="7.5"
+                />
+              </label>
+              <label className="text-caption uppercase tracking-wide text-ink/55">
+                Dairy · servings
+                <input
+                  type="number"
+                  value={dairy}
+                  onChange={(e) => setDairy(e.target.value)}
+                  className="input-line mt-2"
+                  placeholder="1"
+                />
+              </label>
+            </div>
+          </div>
+
+          <hr className="rule" />
+          <div className="flex gap-3">
+            <button onClick={runAnalyze} disabled={loading} className="btn-primary flex-1">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+              {loading ? "Analyzing" : "ANALYZE SKIN"}
             </button>
-          )}
+            {result && (
+              <button
+                onClick={requestLog}
+                disabled={saving || saved}
+                className="inline-flex items-center justify-center gap-2 border border-purple-700 bg-purple-600 px-6 py-3 font-mono text-caption uppercase tracking-[0.18em] text-white transition-all hover:bg-purple-700 active:translate-y-px disabled:opacity-60"
+                style={{ borderRadius: 2 }}
+              >
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : saved ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                {saving ? "Saving" : saved ? "Saved" : "Log day"}
+              </button>
+            )}
+          </div>
+          {error && <p className="font-sans text-body text-purple-700">{error}</p>}
         </div>
-        {error && <p className="text-body text-purple-600">{error}</p>}
       </section>
 
       {/* RIGHT: the essentials only */}
       <section className="space-y-6">
         {!result ? (
-          <div className="panel flex min-h-[420px] flex-col items-center justify-center p-10 text-center">
-            <span className="mb-4 text-caption uppercase tracking-[0.25em] text-purple-700">
-              Awaiting input
-            </span>
-            <p className="max-w-sm font-sans text-subheading leading-snug text-ink/65">
-              Capture a photo, log what you used today, then press{" "}
-              <span className="font-display italic text-ink">analyze skin</span> for your four
-              scores, how they moved, and what to do next.
+          <div className="panel flex min-h-[420px] flex-col justify-center p-10">
+            <h2 className="kicker text-ink/35">a blank page</h2>
+            <p className="mt-3 max-w-md font-display text-heading-sm italic leading-tight text-ink/75">
+              Your reading develops here.
+            </p>
+            <p className="mt-4 max-w-sm font-sans text-body leading-relaxed text-ink/55">
+              Capture today's photo, note what you used, then run the analysis to see your four
+              scores, how far they moved, and what to do next.
             </p>
           </div>
         ) : (
@@ -198,7 +215,7 @@ export default function ScanPage({ onLogged }) {
             <HealthSummary delta={delta} previousDate={previous?.date} />
             <ScoreCards axes={result.analysis?.axes} previousAxes={previousAxes} />
             <ActionList actions={actions} />
-            <p className="text-caption uppercase tracking-wide text-black/45">
+            <p className="text-caption uppercase tracking-wide text-ink/45">
               {saved ? "Logged — open Reports for the full breakdown." : "Press Log day to save this scan and unlock the full report."}
             </p>
           </>

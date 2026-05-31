@@ -75,6 +75,12 @@ export function deleteReport(date) {
   return getReports();
 }
 
+// Wipe all locally stored reports (used by the dev seeding page).
+export function clearReports() {
+  write([]);
+  return [];
+}
+
 // Downscale a photo (blob or object/data URL) to a small JPEG data URL so it can
 // live in localStorage without blowing the ~5MB quota.
 export function makeThumbnail(source, maxSize = 320) {

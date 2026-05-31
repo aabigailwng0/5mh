@@ -41,38 +41,44 @@ function DeltaChip({ improvement }) {
 export default function ScoreCards({ axes, previousAxes }) {
   if (!axes) return null;
   return (
-    <div className="grid grid-cols-2 gap-4">
-      {ORDER.map((key) => {
-        const data = axes[key];
-        if (!data) return null;
-        const meta = AXIS_META[key];
-        const Icon = meta.icon;
-        const color = barColor(data.value, meta.goodIsHigh);
-        const improvement = axisImprovement(key, data.value, previousAxes?.[key]?.value);
-        return (
-          <div key={key} className="panel">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4 text-black/70" strokeWidth={1.5} />
-                <span className="text-body font-medium">{meta.title}</span>
+    <div className="panel">
+      <h3 className="kicker mb-4">the four readings</h3>
+      <div className="divide-y divide-ink/10">
+        {ORDER.map((key) => {
+          const data = axes[key];
+          if (!data) return null;
+          const meta = AXIS_META[key];
+          const Icon = meta.icon;
+          const color = barColor(data.value, meta.goodIsHigh);
+          const improvement = axisImprovement(key, data.value, previousAxes?.[key]?.value);
+          return (
+            <div key={key} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+              <div className="flex w-32 shrink-0 items-center gap-2">
+                <Icon className="h-4 w-4 text-ink/70" strokeWidth={1.5} />
+                <span className="font-sans text-body">{meta.title}</span>
               </div>
-              <span className="font-display text-heading-sm font-medium" style={{ color }}>
-                {Math.round(data.value)}%
+              <div className="min-w-0 flex-1">
+                <div className="h-1.5 w-full overflow-hidden bg-ink/10">
+                  <div
+                    className="spectrum-fill h-full"
+                    style={{ width: `${data.value}%`, backgroundColor: color }}
+                  />
+                </div>
+                <div className="mt-1.5 flex items-center justify-between">
+                  <span className="text-caption uppercase tracking-wide text-ink/55">{data.label}</span>
+                  <DeltaChip improvement={improvement} />
+                </div>
+              </div>
+              <span
+                className="w-12 shrink-0 text-right font-display text-heading-sm font-medium"
+                style={{ color }}
+              >
+                {Math.round(data.value)}
               </span>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-purple-100">
-              <div
-                className="spectrum-fill h-full rounded-full"
-                style={{ width: `${data.value}%`, backgroundColor: color }}
-              />
-            </div>
-            <div className="mt-2 flex items-center justify-between">
-              <span className="text-caption uppercase tracking-wide text-black/55">{data.label}</span>
-              <DeltaChip improvement={improvement} />
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

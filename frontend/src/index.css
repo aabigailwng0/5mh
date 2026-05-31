@@ -23,16 +23,20 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Film-grain wash over the whole page. */
+/* Film-grain / noise wash over the whole page. Two layered turbulences — a fine
+   grain plus a slightly coarser speckle — give a denser, dithered, tactile feel.
+   `multiply` lets the dots bite into both the paper and the white sheets. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.045;
+  opacity: 0.16;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  background-size: 200px 200px, 160px 160px;
 }
 
 /* Faint dashed column guides — the "laid-out on a worktable" feel. */
@@ -133,9 +137,34 @@ body::after {
     @apply border-0 border-t border-dashed border-ink/25;
   }
 
-  /* Small mono "filed label" — section eyebrows / captions. */
+  /* Small mono "filed label" — reserved for tiny meta (dates, ticks). */
   .eyebrow {
     @apply font-mono text-caption uppercase tracking-[0.22em] text-ink/55;
+  }
+
+  /* Editorial section title: a serif italic kicker, set inline with the
+     content rather than stacked as a labelled-box header. */
+  .kicker {
+    @apply font-display text-subheading font-medium italic leading-none text-ink/75;
+    font-variation-settings: "SOFT" 0, "WONK" 1;
+  }
+
+  /* Hairline ink rule — the structural device that replaces box chrome. */
+  .rule {
+    @apply border-0 border-t border-ink/15;
+  }
+
+  /* A logged item rendered as a typewritten filing entry, not a pill. */
+  .filing-tag {
+    @apply inline-flex items-center gap-2 border-b border-ink/35 pb-0.5 font-mono
+      text-caption uppercase tracking-[0.06em] text-ink/85;
+  }
+
+  /* Faint engineer's graph paper, used behind the charts for an analog plot feel. */
+  .graph-paper {
+    background-image: linear-gradient(rgba(22, 20, 18, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(22, 20, 18, 0.05) 1px, transparent 1px);
+    background-size: 21px 21px;
   }
 
   /* Hand-applied highlighter mark — used behind the active nav tab. */

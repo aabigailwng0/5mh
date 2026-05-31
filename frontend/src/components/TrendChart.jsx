@@ -7,8 +7,8 @@ const PAD = { left: 30, right: 14, top: 14, bottom: 28 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
-const AXIS_COLOR = "#7c3aed"; // the skin-axis trend line
-const LOAD_COLOR = "#dc5000"; // the relevant ingredient load (secondary)
+const AXIS_COLOR = "#161412"; // the skin-axis trend line (bold ink)
+const LOAD_COLOR = "#7c3aed"; // the relevant ingredient load (purple accent, dashed)
 
 // Which aggregate load is most relevant to overlay for a given axis.
 const LOAD_FOR_AXIS = {
@@ -69,7 +69,7 @@ export default function TrendChart({ history, axis, drivers = [] }) {
 
   if (points.length < 2) {
     return (
-      <p className="text-body text-black/55">
+      <p className="font-display text-body italic text-ink/55">
         Log at least two days to see your {axis} trend over time.
       </p>
     );
@@ -91,40 +91,82 @@ export default function TrendChart({ history, axis, drivers = [] }) {
     : null;
 
   const ingredients = pickIngredients(history, drivers);
-  const stripColors = ["#7c3aed", "#dc5000"];
+  const stripColors = ["#7c3aed", "#bd7a2c"];
 
   return (
     <div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={`${axis} over time`}>
-        {/* Horizontal gridlines at 0 / 50 / 100 */}
-        {[0, 50, 100].map((g) => (
-          <g key={g}>
-            <line x1={PAD.left} y1={yAxis(g)} x2={W - PAD.right} y2={yAxis(g)} stroke="#00000010" />
-            <text x={PAD.left - 6} y={yAxis(g) + 3} textAnchor="end" fontSize="9" fill="#00000066">
-              {g}
+      <div className="graph-paper border border-ink/10 px-1 py-1">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={`${axis} over time`}>
+          {/* Horizontal gridlines at 0 / 50 / 100 */}
+          {[0, 50, 100].map((g) => (
+            <g key={g}>
+              <line
+                x1={PAD.left}
+                y1={yAxis(g)}
+                x2={W - PAD.right}
+                y2={yAxis(g)}
+                stroke="#16141233"
+                strokeDasharray="1 4"
+              />
+              <text
+                x={PAD.left - 6}
+                y={yAxis(g) + 3}
+                textAnchor="end"
+                fontSize="9"
+                fill="#16141288"
+                fontFamily="'Space Mono', monospace"
+              >
+                {g}
+              </text>
+            </g>
+          ))}
+
+          {/* Secondary: relevant load (dashed) */}
+          {loadPath && (
+            <path
+              d={loadPath}
+              fill="none"
+              stroke={LOAD_COLOR}
+              strokeWidth="1.5"
+              strokeDasharray="4 3"
+              opacity="0.7"
+              style={{ filter: "url(#sketch)" }}
+            />
+          )}
+
+          {/* Primary: the skin-axis trend */}
+          <path
+            d={axisPath}
+            fill="none"
+            stroke={AXIS_COLOR}
+            strokeWidth="2.2"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            style={{ filter: "url(#sketch)" }}
+          />
+          {points.map((p, i) => (
+            <circle key={i} cx={xAt(i, n)} cy={yAxis(p.value)} r="2.4" fill={AXIS_COLOR} />
+          ))}
+
+          {/* X labels: first, middle, last date */}
+          {[0, Math.floor((n - 1) / 2), n - 1].map((i) => (
+            <text
+              key={i}
+              x={xAt(i, n)}
+              y={H - 8}
+              textAnchor="middle"
+              fontSize="9"
+              fill="#16141288"
+              fontFamily="'Space Mono', monospace"
+            >
+              {fmtDate(points[i].date)}
             </text>
-          </g>
-        ))}
-
-        {/* Secondary: relevant load (dashed) */}
-        {loadPath && <path d={loadPath} fill="none" stroke={LOAD_COLOR} strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />}
-
-        {/* Primary: the skin-axis trend */}
-        <path d={axisPath} fill="none" stroke={AXIS_COLOR} strokeWidth="2" />
-        {points.map((p, i) => (
-          <circle key={i} cx={xAt(i, n)} cy={yAxis(p.value)} r="2.5" fill={AXIS_COLOR} />
-        ))}
-
-        {/* X labels: first, middle, last date */}
-        {[0, Math.floor((n - 1) / 2), n - 1].map((i) => (
-          <text key={i} x={xAt(i, n)} y={H - 8} textAnchor="middle" fontSize="9" fill="#00000066">
-            {fmtDate(points[i].date)}
-          </text>
-        ))}
-      </svg>
+          ))}
+        </svg>
+      </div>
 
       {/* Legend */}
-      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-caption uppercase tracking-wide text-black/55">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-caption uppercase tracking-wide text-ink/55">
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-0.5 w-4" style={{ backgroundColor: AXIS_COLOR }} />
           {axis}
@@ -142,7 +184,7 @@ export default function TrendChart({ history, axis, drivers = [] }) {
         <div className="mt-3 space-y-1.5">
           {ingredients.map((name, idx) => (
             <div key={name} className="flex items-center gap-2">
-              <span className="w-28 shrink-0 truncate text-caption uppercase tracking-wide text-black/55">
+              <span className="w-28 shrink-0 truncate font-mono text-caption uppercase tracking-wide text-ink/55">
                 {name}
               </span>
               <div className="flex flex-1 gap-0.5">
@@ -150,9 +192,9 @@ export default function TrendChart({ history, axis, drivers = [] }) {
                   <div
                     key={i}
                     title={`${fmtDate(p.date)} · ${p.used.has(name) ? "used" : "not used"}`}
-                    className="h-3 flex-1 rounded-[2px]"
+                    className="h-3 flex-1"
                     style={{
-                      backgroundColor: p.used.has(name) ? stripColors[idx % 2] : "#00000010",
+                      backgroundColor: p.used.has(name) ? stripColors[idx % 2] : "#16141212",
                     }}
                   />
                 ))}

@@ -8,14 +8,14 @@ const PAD = { left: 30, right: 14, top: 14, bottom: 28 };
 const PLOT_W = W - PAD.left - PAD.right;
 const PLOT_H = H - PAD.top - PAD.bottom;
 
-// The unified score is bold; the four contributing axes are thinner context lines
-// in their dashboard colours. All share the 0–100 scale.
+// The unified score is bold ink; the four contributing axes are thinner context
+// lines in a muted, slightly faded printer's palette. All share the 0–100 scale.
 const SERIES = [
-  { key: "overall", label: "Skin health", color: "#7c3aed", width: 3, dots: true },
-  { key: "acne", label: "Acne", color: "#ef4444", width: 1.5 },
-  { key: "redness", label: "Redness", color: "#f97316", width: 1.5 },
-  { key: "hyperpigmentation", label: "Pigmentation", color: "#d946ef", width: 1.5 },
-  { key: "hydration", label: "Hydration", color: "#06b6d4", width: 1.5 },
+  { key: "overall", label: "Skin health", color: "#161412", width: 2.6, dots: true },
+  { key: "acne", label: "Acne", color: "#b1402f", width: 1.4 },
+  { key: "redness", label: "Redness", color: "#bd7a2c", width: 1.4 },
+  { key: "hyperpigmentation", label: "Pigmentation", color: "#7b5e86", width: 1.4 },
+  { key: "hydration", label: "Hydration", color: "#3f6b63", width: 1.4 },
 ];
 
 function fmtDate(iso) {
@@ -51,8 +51,8 @@ export default function OverviewTrend({ reports }) {
   if (days.length < 2) {
     return (
       <div className="panel">
-        <h3 className="mb-2 text-caption uppercase tracking-[0.2em] text-black/70">Overall trend</h3>
-        <p className="text-body text-black/55">
+        <h3 className="kicker mb-2">overall trend</h3>
+        <p className="font-display text-body italic text-ink/55">
           Log at least two days to see your overall skin-health trend.
         </p>
       </div>
@@ -71,52 +71,85 @@ export default function OverviewTrend({ reports }) {
 
   return (
     <div className="panel">
-      <div className="mb-3 flex items-baseline justify-between">
-        <h3 className="text-caption uppercase tracking-[0.2em] text-black/70">Overall trend</h3>
-        <span className="text-caption uppercase tracking-wide text-black/50">
+      <div className="mb-4 flex items-baseline justify-between">
+        <h3 className="kicker">overall trend</h3>
+        <span className="eyebrow">
           now {latest.overall}/100 · {n} days
         </span>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Overall skin health over time">
-        {[0, 50, 100].map((g) => (
-          <g key={g}>
-            <line x1={PAD.left} y1={y(g)} x2={W - PAD.right} y2={y(g)} stroke="#00000010" />
-            <text x={PAD.left - 6} y={y(g) + 3} textAnchor="end" fontSize="9" fill="#00000066">
-              {g}
-            </text>
-          </g>
-        ))}
-
-        {SERIES.map((s) => {
-          if (hidden[s.key]) return null;
-          return (
-            <g key={s.key}>
-              <path d={pathFor(s.key)} fill="none" stroke={s.color} strokeWidth={s.width} opacity={s.key === "overall" ? 1 : 0.55} />
-              {s.dots &&
-                days.map((d, i) =>
-                  d[s.key] == null ? null : (
-                    <circle key={i} cx={xAt(i, n)} cy={y(d[s.key])} r="3" fill={s.color} />
-                  )
-                )}
+      <div className="graph-paper border border-ink/10 px-1 py-1">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Overall skin health over time">
+          {[0, 50, 100].map((g) => (
+            <g key={g}>
+              <line
+                x1={PAD.left}
+                y1={y(g)}
+                x2={W - PAD.right}
+                y2={y(g)}
+                stroke="#16141233"
+                strokeDasharray="1 4"
+              />
+              <text
+                x={PAD.left - 6}
+                y={y(g) + 3}
+                textAnchor="end"
+                fontSize="9"
+                fill="#16141288"
+                fontFamily="'Space Mono', monospace"
+              >
+                {g}
+              </text>
             </g>
-          );
-        })}
+          ))}
 
-        {[0, Math.floor((n - 1) / 2), n - 1].map((i) => (
-          <text key={i} x={xAt(i, n)} y={H - 8} textAnchor="middle" fontSize="9" fill="#00000066">
-            {fmtDate(days[i].date)}
-          </text>
-        ))}
-      </svg>
+          {SERIES.map((s) => {
+            if (hidden[s.key]) return null;
+            return (
+              <g key={s.key}>
+                <path
+                  d={pathFor(s.key)}
+                  fill="none"
+                  stroke={s.color}
+                  strokeWidth={s.width}
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  opacity={s.key === "overall" ? 1 : 0.7}
+                  style={{ filter: "url(#sketch)" }}
+                />
+                {s.dots &&
+                  days.map((d, i) =>
+                    d[s.key] == null ? null : (
+                      <circle key={i} cx={xAt(i, n)} cy={y(d[s.key])} r="2.6" fill={s.color} />
+                    )
+                  )}
+              </g>
+            );
+          })}
+
+          {[0, Math.floor((n - 1) / 2), n - 1].map((i) => (
+            <text
+              key={i}
+              x={xAt(i, n)}
+              y={H - 8}
+              textAnchor="middle"
+              fontSize="9"
+              fill="#16141288"
+              fontFamily="'Space Mono', monospace"
+            >
+              {fmtDate(days[i].date)}
+            </text>
+          ))}
+        </svg>
+      </div>
 
       {/* Clickable legend toggles each line */}
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
         {SERIES.map((s) => (
           <button
             key={s.key}
             onClick={() => setHidden((h) => ({ ...h, [s.key]: !h[s.key] }))}
-            className={`flex items-center gap-1.5 text-caption uppercase tracking-wide transition-opacity ${
+            className={`flex items-center gap-1.5 font-mono text-caption uppercase tracking-wide transition-opacity ${
               hidden[s.key] ? "opacity-35" : "opacity-100"
             }`}
           >
@@ -124,7 +157,7 @@ export default function OverviewTrend({ reports }) {
               className="inline-block h-0.5 w-4"
               style={{ backgroundColor: s.color, height: s.key === "overall" ? 3 : 2 }}
             />
-            <span className="text-black/65">{s.label}</span>
+            <span className="text-ink/65">{s.label}</span>
           </button>
         ))}
       </div>
