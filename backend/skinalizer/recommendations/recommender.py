@@ -8,9 +8,14 @@ penalising high comedogenic / irritant loads).
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ..ingredients.knowledge_base import IngredientKnowledgeBase
 from ..models import Product, Recommendation, SkinAnalysis, SkinAxis
-from ..products.catalog import SephoraCatalog
+
+if TYPE_CHECKING:
+    from ..products.catalog import SephoraCatalog
+    from ..products.kaggle_catalog import KaggleCatalog
 
 # An axis "needs help" past these thresholds. Hydration is inverted (low = bad).
 _PROBLEM_THRESHOLD = 40.0
@@ -20,9 +25,16 @@ _HYDRATION_THRESHOLD = 50.0
 class Recommender:
     """Suggests ingredients and products to improve weak axes."""
 
-    def __init__(self, knowledge_base: IngredientKnowledgeBase, catalog: SephoraCatalog):
+    def __init__(
+        self,
+        knowledge_base: IngredientKnowledgeBase,
+        sephora_catalog: SephoraCatalog,
+        kaggle_catalog: KaggleCatalog | None = None,
+    ):
         self._kb = knowledge_base
-        self._catalog = catalog
+        self._catalogs = [sephora_catalog]
+        if kaggle_catalog is not None:
+            self._catalogs.append(kaggle_catalog)
 
     def recommend(
         self,
@@ -102,18 +114,19 @@ class Recommender:
         if not wanted_set:
             return []
         scored: list[tuple[float, Product]] = []
-        for product in self._catalog.all_products():
-            benefit = 0
-            penalty = 0.0
-            for raw in product.raw_ingredients:
-                ing = self._kb.match(raw)
-                if not ing:
-                    continue
-                if ing.inci_name.lower() in wanted_set:
-                    benefit += 1
-                penalty += ing.comedogenic_rating * 0.3 + ing.irritant_weight * 0.5
-            if benefit:
-                scored.append((benefit - penalty, product))
+        for catalog in self._catalogs:
+            for product in catalog.all_products():
+                benefit = 0
+                penalty = 0.0
+                for raw in product.raw_ingredients:
+                    ing = self._kb.match(raw)
+                    if not ing:
+                        continue
+                    if ing.inci_name.lower() in wanted_set:
+                        benefit += 1
+                    penalty += ing.comedogenic_rating * 0.3 + ing.irritant_weight * 0.5
+                if benefit:
+                    scored.append((benefit - penalty, product))
         scored.sort(key=lambda t: t[0], reverse=True)
         return [p for _, p in scored[:limit]]
 

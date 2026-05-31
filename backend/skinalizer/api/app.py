@@ -61,6 +61,7 @@ def create_app() -> FastAPI:
         return {
             "status": "ok",
             "catalog_products": len(engine.catalog),
+            "kaggle_products": len(engine.kaggle_catalog),
             "ingredients_known": len(engine.knowledge_base.all_ingredients()),
             "classifier_backend": bool(classifier and classifier.available),
             "entries_logged": engine.log_store.count(),

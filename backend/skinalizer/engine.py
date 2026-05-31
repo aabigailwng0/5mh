@@ -23,7 +23,7 @@ from .attribution import AttributionEngine
 from .config import EngineConfig
 from .ingredients import IngredientKnowledgeBase, IngredientScorer, InteractionTable
 from .models import Product, SkinAxis
-from .products import OpenBeautyFactsClient, ProductResolver, SephoraCatalog
+from .products import KaggleCatalog, OpenBeautyFactsClient, ProductResolver, SephoraCatalog
 from .recommendations import Recommender, ScheduleBuilder, WarningService
 from .scoring import FeatureExtractor, KerasClassifierBackend, SkinScorer
 from .storage import DailyLogStore
@@ -43,12 +43,13 @@ class SkinalizerEngine:
 
         # --- products ---
         self.catalog = SephoraCatalog(self.config.sephora_csv)
+        self.kaggle_catalog = KaggleCatalog(self.config.kaggle_csv)
         self.obf = OpenBeautyFactsClient(
             self.config.storage_dir / "obf_cache",
             enabled=self.config.enable_open_beauty_facts,
             timeout=self.config.obf_timeout_seconds,
         )
-        self.resolver = ProductResolver(self.catalog, self.obf)
+        self.resolver = ProductResolver(self.catalog, self.obf, self.kaggle_catalog)
 
         # --- skin scoring ---
         self.feature_extractor = FeatureExtractor()
@@ -60,7 +61,7 @@ class SkinalizerEngine:
         # --- recommendations ---
         self.schedule_builder = ScheduleBuilder(self.config.routine_rules_json, self.knowledge_base)
         self.warning_service = WarningService(self.knowledge_base, self.interactions)
-        self.recommender = Recommender(self.knowledge_base, self.catalog)
+        self.recommender = Recommender(self.knowledge_base, self.catalog, self.kaggle_catalog)
 
         # --- attribution + storage ---
         self.attribution_engine = AttributionEngine(

@@ -30,6 +30,11 @@ def _path_env(var: str, default: Path) -> Path:
 # works out of the box. Override with SKINALIZER_SEPHORA_CSV to point elsewhere.
 SEPHORA_CSV = _path_env("SKINALIZER_SEPHORA_CSV", DATA_DIR / "sephora_products.csv")
 
+# The Kaggle skincare products dataset (optional). Download from:
+# https://www.kaggle.com/datasets/eward96/skincare-products-clean-dataset
+# and rename the file to skincare_products_clean.csv, then place it in DATA_DIR.
+KAGGLE_CSV = _path_env("SKINALIZER_KAGGLE_CSV", DATA_DIR / "skincare_products_clean.csv")
+
 # Seeded knowledge bases (curated, version-controlled, always present).
 INGREDIENT_PROPERTIES_CSV = DATA_DIR / "ingredient_properties.csv"
 INGREDIENT_INTERACTIONS_CSV = DATA_DIR / "ingredient_interactions.csv"
@@ -50,6 +55,7 @@ class EngineConfig:
 
     # --- Data sources ---
     sephora_csv: Path = SEPHORA_CSV
+    kaggle_csv: Path = KAGGLE_CSV
     ingredient_properties_csv: Path = INGREDIENT_PROPERTIES_CSV
     ingredient_interactions_csv: Path = INGREDIENT_INTERACTIONS_CSV
     routine_rules_json: Path = ROUTINE_RULES_JSON

@@ -1,8 +1,8 @@
 """Unified product lookup across all sources.
 
-Resolution order is chosen for hackathon reliability: the local Sephora sample
-(instant, always available) first, then Open Beauty Facts (broad, networked),
-then a manual fallback so the user can always type an ingredient list by hand.
+Resolution order is chosen for hackathon reliability: local catalogues (instant,
+always available) first, then Open Beauty Facts (broad, networked), then a manual
+fallback so the user can always type an ingredient list by hand.
 """
 
 from __future__ import annotations
@@ -11,28 +11,51 @@ import re
 
 from ..models import Product
 from .catalog import SephoraCatalog
+from .kaggle_catalog import KaggleCatalog
 from .open_beauty_facts import OpenBeautyFactsClient
 
 
 class ProductResolver:
     """Resolves a barcode / name / manual entry into a :class:`Product`."""
 
-    def __init__(self, catalog: SephoraCatalog, obf: OpenBeautyFactsClient):
-        self._catalog = catalog
+    def __init__(
+        self,
+        sephora_catalog: SephoraCatalog,
+        obf: OpenBeautyFactsClient,
+        kaggle_catalog: KaggleCatalog | None = None,
+    ):
+        self._catalogs = [sephora_catalog]
+        if kaggle_catalog is not None:
+            self._catalogs.append(kaggle_catalog)
         self._obf = obf
 
     def search(self, query: str, limit: int = 10) -> list[Product]:
-        """Search the local catalogue first, then top up from OBF."""
-        results = self._catalog.search(query, limit=limit)
+        """Search all local catalogues first, then top up from OBF."""
+        results: list[Product] = []
+        seen = set()
+
+        # Search all local catalogues
+        for catalog in self._catalogs:
+            for p in catalog.search(query, limit=limit - len(results)):
+                if p.name.lower() not in seen:
+                    results.append(p)
+                    seen.add(p.name.lower())
+                if len(results) >= limit:
+                    break
+            if len(results) >= limit:
+                break
+
+        # Top up from OBF if needed
         if len(results) < limit:
-            seen = {p.name.lower() for p in results}
             for p in self._obf.search_by_name(query, limit=limit - len(results)):
                 if p.name.lower() not in seen:
                     results.append(p)
+                    seen.add(p.name.lower())
+
         return results
 
     def by_barcode(self, barcode: str) -> Product | None:
-        """Barcode lookup: OBF (real barcodes), then Sephora SKU match."""
+        """Barcode lookup: OBF (real barcodes), then local catalogues SKU match."""
         barcode = (barcode or "").strip()
         if not barcode:
             return None
@@ -40,9 +63,10 @@ class ProductResolver:
         if product is not None:
             return product
         digits = re.sub(r"\D", "", barcode)
-        for p in self._catalog.all_products():
-            if p.barcode and re.sub(r"\D", "", p.barcode) == digits:
-                return p
+        for catalog in self._catalogs:
+            for p in catalog.all_products():
+                if p.barcode and re.sub(r"\D", "", p.barcode) == digits:
+                    return p
         return None
 
     @staticmethod
