@@ -1,5 +1,9 @@
 # Glow: An Intelligent Platform for Your Skin
-by 5MinuteHacks/5MH (Muyi Tang, Thomas Li, Abigail Wang, Leo Fu)
+*by 5MinuteHacks/5MH (Muyi Tang, Thomas Li, Abigail Wang, Leo Fu)*
+
+*submitted to the ["Hack Your Life"](https://hack-your-life.devpost.com/) hackathon hosted by XDHacks for high school students across Vancouver, winning 2nd place*
+
+## Summary
 
 **Treat your face like a market price.** One photo a day + your product log →
 an explainable read on four skin spectrums, the ingredient "loads" driving them,
