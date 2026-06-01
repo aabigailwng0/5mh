@@ -1,4 +1,5 @@
 # Glow: An Intelligent Platform for Your Skin
+by 5MinuteHacks/5MH (Muyi Tang, Thomas Li, Abigail Wang, Leo Fu)
 
 **Treat your face like a market price.** One photo a day + your product log →
 an explainable read on four skin spectrums, the ingredient "loads" driving them,
